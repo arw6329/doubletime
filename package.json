@@ -1,0 +1,41 @@
+{
+    "name": "object-schema-validation",
+    "version": "0.1.0",
+    "description": "Validate object schemas with compile-time and runtime type safety",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/index.js",
+        "dist/index.d.ts"
+    ],
+    "scripts": {
+        "build": "rollup -c",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/arw6329/object-schema-validation.git"
+    },
+    "keywords": [
+        "schemas",
+        "types",
+        "type validation",
+        "schema validation",
+        "type safety",
+        "runtime types"
+    ],
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/arw6329/object-schema-validation/issues"
+    },
+    "homepage": "https://github.com/arw6329/object-schema-validation#readme",
+    "devDependencies": {
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^12.1.2",
+        "rollup": "^4.34.9",
+        "rollup-plugin-dts": "^6.1.1",
+        "tslib": "^2.8.1",
+        "typescript": "^5.8.2"
+    }
+}

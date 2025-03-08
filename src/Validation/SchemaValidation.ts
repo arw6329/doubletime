@@ -33,7 +33,9 @@ type NormalizedValidator<V> = {
         ? NullableValidator<SchemaPreOptionalProcessing<V[Key]>>
         : V[Key] extends Empty<V[Key]>
         ? undefined
-        : NormalizedValidator<V[Key]>
+        : V[Key] extends Record<string | symbol, unknown>
+        ? NormalizedValidator<V[Key]>
+        : undefined
 }
 
 type SchemaPreOptionalProcessing<V> = NormalizedValidator<V> extends PureValidator<infer S> ? S : never

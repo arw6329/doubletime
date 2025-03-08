@@ -1,3 +1,1 @@
-export function x(a: number): number {
-    return 1
-}
+export { nullable, validate } from "./entrypoint"

@@ -1,7 +1,7 @@
-import type { Schema, TypeValidator, Validator } from "../SchemaValidation"
+import type { Schema, TypeValidator, ConcreteSchema } from "../SchemaValidation"
 import { ShorthandValidators } from "../ShorthandValidators"
 
-function isTypeValidator<T>(validator: Validator|TypeValidator<T>): validator is TypeValidator<T> {
+function isTypeValidator<T>(validator: ConcreteSchema|TypeValidator<T>): validator is TypeValidator<T> {
     return 'validate' in validator && validator.validate instanceof Function
 }
 
@@ -10,13 +10,13 @@ export const optionalKeys = Symbol('whether keys marked as nullable are optional
 
 type UnknownObj = { [key: string]: unknown }
 
-export class ObjectValidator<V extends Validator> implements TypeValidator<Schema<V>> {
+export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator<Schema<CS>> {
     constructor(
-        private validator: V,
+        private concreteSchema: CS,
         private parseStrings: boolean = false
     ) {}
 
-    validate(params: unknown): [value: null, error: string] | [value: Schema<V>, error: null] {
+    validate(params: unknown): [value: null, error: string] | [value: Schema<CS>, error: null] {
         if(this.parseStrings && typeof params === 'string') {
             try {
                 params = JSON.parse(params)
@@ -31,9 +31,9 @@ export class ObjectValidator<V extends Validator> implements TypeValidator<Schem
 
         const rawParams: UnknownObj = params as UnknownObj
 
-        const parsedParams: Schema<V> = {} as Schema<V>
+        const parsedParams: Schema<CS> = {} as Schema<CS>
 
-        for(const keyWithPossibleQuestionMark of Object.keys(this.validator) as Array<keyof Validator & string>) {
+        for(const keyWithPossibleQuestionMark of Object.keys(this.concreteSchema) as Array<keyof ConcreteSchema & string>) {
             // need to remove question mark if key was marked optional
             const key = keyWithPossibleQuestionMark.replace(/\?$/, '')
 
@@ -48,7 +48,7 @@ export class ObjectValidator<V extends Validator> implements TypeValidator<Schem
                     continue
                 }
 
-                if(!(optionalKeys in this.validator && this.validator[optionalKeys] === true)) {
+                if(!(optionalKeys in this.concreteSchema && this.concreteSchema[optionalKeys] === true)) {
                     // Object is not marked as "missing nullable keys default to null",
                     // so key was required. Raise error
                     return [null, `required parameter ${String(key)} not provided`]
@@ -60,32 +60,36 @@ export class ObjectValidator<V extends Validator> implements TypeValidator<Schem
             // or missing but marked as "default to null".
             rawParams[key] ??= null
 
-            let singleKeyValidator: TypeValidator<unknown> | Validator
+            let concreteSchemaValueAtKey: TypeValidator<unknown> | ConcreteSchema
 
-            const nonNormalizedSingleKeyValidator = this.validator[keyWithPossibleQuestionMark] as Validator[keyof Validator & string]
+            const nonNormalizedConcreteSchemaValueAtKey = this.concreteSchema[keyWithPossibleQuestionMark] as ConcreteSchema[keyof ConcreteSchema & string]
 
-            if(typeof nonNormalizedSingleKeyValidator === 'string') {
-                singleKeyValidator = ShorthandValidators[nonNormalizedSingleKeyValidator]
+            if(typeof nonNormalizedConcreteSchemaValueAtKey === 'string') {
+                concreteSchemaValueAtKey = ShorthandValidators[nonNormalizedConcreteSchemaValueAtKey]
+
+                if(!concreteSchemaValueAtKey) {
+                    return [null, `unknown type "${nonNormalizedConcreteSchemaValueAtKey}" specified in concrete schema`]
+                }
             } else {
-                singleKeyValidator = nonNormalizedSingleKeyValidator
+                concreteSchemaValueAtKey = nonNormalizedConcreteSchemaValueAtKey
             }
 
-            if(isTypeValidator(singleKeyValidator)) {
-                const [value, error] = singleKeyValidator.validate(rawParams[key])
+            if(isTypeValidator(concreteSchemaValueAtKey)) {
+                const [value, error] = concreteSchemaValueAtKey.validate(rawParams[key])
         
                 if(error !== null) {
                     return [null, `error during validation of parameter ${String(key)}: ${error}`]
                 }
         
-                parsedParams[key as keyof Schema<V>] = value as Schema<V>[keyof Schema<V>]
+                parsedParams[key as keyof Schema<CS>] = value as Schema<CS>[keyof Schema<CS>]
             } else {
-                if(singleKeyValidator[nullable] === true && rawParams[key] === null) {
+                if(concreteSchemaValueAtKey[nullable] === true && rawParams[key] === null) {
                     // using NullableValidator(ObjectValidator) resulted in infinite recursion in tsc for some reason
-                    parsedParams[key as keyof Schema<V>] = null as Schema<V>[keyof Schema<V>]
+                    parsedParams[key as keyof Schema<CS>] = null as Schema<CS>[keyof Schema<CS>]
                 } else {
                     // also infinite recursion here if this isn't typed as unknown
                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                    const subTypeValidator: any = new ObjectValidator(singleKeyValidator)
+                    const subTypeValidator: any = new ObjectValidator(concreteSchemaValueAtKey)
 
                     const [value, error] = subTypeValidator.validate(params[key as keyof typeof params]) as [null, string] | [unknown, null]
     
@@ -93,7 +97,7 @@ export class ObjectValidator<V extends Validator> implements TypeValidator<Schem
                         return [null, `error during validation of parameter ${String(key)}: ${error}`]
                     }
     
-                    parsedParams[key as keyof Schema<V>] = value as Schema<V>[keyof Schema<V>]
+                    parsedParams[key as keyof Schema<CS>] = value as Schema<CS>[keyof Schema<CS>]
                 }
             }
         }

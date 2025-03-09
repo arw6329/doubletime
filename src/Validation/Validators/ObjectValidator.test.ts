@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { ObjectValidator } from './ObjectValidator'
 
-const runtimeValidator = {
+const concreteSchema = {
     'uuid': 'uuid'
 } as const
 
@@ -19,12 +19,12 @@ function expectedObject() {
 
 describe('ObjectValidator', () => {
     it('accepts valid objects', () => {
-        const validator = new ObjectValidator(runtimeValidator, false)
+        const validator = new ObjectValidator(concreteSchema, false)
         expect(validator.validate(testObject() as unknown)).toEqual([expectedObject(), null])
     })
 
     it('rejects non-object values', () => {
-        const validator = new ObjectValidator(runtimeValidator, false)
+        const validator = new ObjectValidator(concreteSchema, false)
         const expectedResult = [null, 'value not of expected type']
         expect(validator.validate(123 as unknown)).toEqual(expectedResult)
         expect(validator.validate('abc' as unknown)).toEqual(expectedResult)
@@ -34,12 +34,12 @@ describe('ObjectValidator', () => {
     })
 
     it('parses JSON strings when specified', () => {
-        const validator = new ObjectValidator(runtimeValidator, true)
+        const validator = new ObjectValidator(concreteSchema, true)
         expect(validator.validate(JSON.stringify(testObject()) as unknown)).toEqual([expectedObject(), null])
     })
 
     it('does not parse JSON strings when specified', () => {
-        const validator = new ObjectValidator(runtimeValidator, false)
+        const validator = new ObjectValidator(concreteSchema, false)
         const expectedResult = [null, 'value not of expected type']
         expect(validator.validate(JSON.stringify(testObject()) as unknown)).toEqual(expectedResult)
     })

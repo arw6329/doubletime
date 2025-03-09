@@ -7,38 +7,38 @@ export interface TypeValidator<T> {
     validate(value: unknown): [value: T, error: null] | [value: null, error: string]
 }
 
-type PureValidator<S> = {
+type PureConcreteSchema<S> = {
     [Key in keyof S]:
-        TypeValidator<S[Key]>|PureValidator<S[Key]>
+        TypeValidator<S[Key]> | PureConcreteSchema<S[Key]>
 }
 
-export type Validator = {
+export type ConcreteSchema = {
     [configKey: symbol]: boolean,
-    [key: string]: TypeValidator<unknown>|ShorthandValidatorKey|Validator
+    [key: string]: TypeValidator<unknown> | ShorthandValidatorKey | ConcreteSchema
 }
 
 type Empty<T> = keyof T extends never ? T : never
 
-type NormalizedValidator<V> = {
-    [Key in keyof V as Key extends symbol ? never : Key]:
-        V[Key] extends ShorthandValidatorKey
-        ? (typeof ShorthandValidators)[V[Key]]
-        : V[Key] extends TypeValidator<unknown>
-        ? V[Key]
-        : V[Key] extends [ShorthandValidatorKey]
+type NormalizedConcreteSchema<CS> = {
+    [Key in keyof CS as Key extends symbol ? never : Key]:
+        CS[Key] extends ShorthandValidatorKey
+        ? (typeof ShorthandValidators)[CS[Key]]
+        : CS[Key] extends TypeValidator<unknown>
+        ? CS[Key]
+        : CS[Key] extends [ShorthandValidatorKey]
         ? ArrayValidator<number>
-        : V[Key] extends [TypeValidator<infer T>]
+        : CS[Key] extends [TypeValidator<infer T>]
         ? ArrayValidator<T>
-        : V[Key] extends {[nullable]: true}
-        ? NullableValidator<SchemaPreOptionalProcessing<V[Key]>>
-        : V[Key] extends Empty<V[Key]>
+        : CS[Key] extends {[nullable]: true}
+        ? NullableValidator<SchemaPreOptionalProcessing<CS[Key]>>
+        : CS[Key] extends Empty<CS[Key]>
         ? undefined
-        : V[Key] extends Record<string | symbol, unknown>
-        ? NormalizedValidator<V[Key]>
+        : CS[Key] extends Record<string | symbol, unknown>
+        ? NormalizedConcreteSchema<CS[Key]>
         : undefined
 }
 
-type SchemaPreOptionalProcessing<V> = NormalizedValidator<V> extends PureValidator<infer S> ? S : never
+type SchemaPreOptionalProcessing<ConcreteSchema> = NormalizedConcreteSchema<ConcreteSchema> extends PureConcreteSchema<infer S> ? S : never
 
 // https://github.com/microsoft/TypeScript/issues/32562
 type Identity<T> = T;

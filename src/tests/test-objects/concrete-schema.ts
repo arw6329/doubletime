@@ -1,4 +1,4 @@
-import { nullable } from "#/entrypoint"
+import { nullable } from '#/entrypoint'
 
 export const concreteSchema = {
     'uuid': 'uuid',
@@ -54,4 +54,30 @@ export const concreteSchema = {
     'optional nulled provided?': 'string?',
     'optional nullable?': 'string?',
     'optional nullable provided?': 'string?',
+
+    // arrays
+    '(uuid)[]': 'uuid[]',
+    '(uuid nullable)[]': 'uuid?[]',
+    '(uuid nullable)[] nulled': 'uuid?[]?',
+    '(uuid nullable)[] nullable': 'uuid?[]?',
+    '(string)[]': 'string[]',
+    '(string nullable)[]': 'string?[]',
+    '(empty string)[]': 'string[]',
+    '(empty string nullable)[]': 'string?[]',
+    '(trimmed string)[]': 'trimmed string[]',
+    '(trimmed string nullable)[]': 'trimmed string?[]',
+    '(non-empty string)[]': 'non-empty string[]',
+    '(non-empty string nullable)[]': 'non-empty string?[]',
+    '(trimmed non-empty string)[]': 'trimmed non-empty string[]',
+    '(trimmed non-empty string nullable)[]': 'trimmed non-empty string?[]',
+    '(integer)[]': 'integer[]',
+    '(integer nullable)[]': 'integer?[]',
+    '(float)[]': 'float[]',
+    '(float nullable)[]': 'float?[]',
+    '(boolean)[]': 'boolean[]',
+    '(boolean nullable)[]': 'boolean?[]',
+    '(optional)[]?': 'string[]',
+    '(optional provided)[]?': 'string[]',
+    '(optional nullable)[]?': 'string?[]',
+    '(optional nullable provided)[]?': 'string?[]'
 } as const

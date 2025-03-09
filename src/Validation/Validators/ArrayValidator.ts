@@ -6,7 +6,7 @@ export class ArrayValidator<T> implements TypeValidator<Array<T>> {
     ) {}
 
     validate(value: unknown): [value: null, error: string] | [value: Array<T>, error: null] {
-        if(value instanceof Array) {
+        if(Array.isArray(value)) {
             const parsedArray: Array<T> = []
 
             for(let i = 0; i < value.length; i++) {

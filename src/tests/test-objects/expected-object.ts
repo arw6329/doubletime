@@ -47,6 +47,30 @@ export function expectedObject() {
         },
         'optional provided': 'I was optional',
         'optional nulled provided': null,
-        'optional nullable provided': 'I was optional and nullable'
+        'optional nullable provided': 'I was optional and nullable',
+
+        // arrays
+        '(uuid)[]': [ '8532cf2f-2717-48eb-97c0-3390bebf6042', '36e7a848-2328-474f-8a09-caed99ce3c7e' ],
+        '(uuid nullable)[]': [ '8532cf2f-2717-48eb-97c0-3390bebf6042', null, '36e7a848-2328-474f-8a09-caed99ce3c7e' ],
+        '(uuid nullable)[] nulled': null,
+        '(uuid nullable)[] nullable': [ '8532cf2f-2717-48eb-97c0-3390bebf6042', null, '36e7a848-2328-474f-8a09-caed99ce3c7e' ],
+        '(string)[]': [ 'abc', 'def' ],
+        '(string nullable)[]': [ 'abc', 'def', null ],
+        '(empty string)[]': [ 'abc', '' ],
+        '(empty string nullable)[]': [ 'abc', '', null ],
+        '(trimmed string)[]': [ 'abc', '' ],
+        '(trimmed string nullable)[]': [ 'abc', '', null ],
+        '(non-empty string)[]': [ 'abc', 'def' ],
+        '(non-empty string nullable)[]': [ 'abc', 'def', null ],
+        '(trimmed non-empty string)[]': [ 'abc', 'def' ],
+        '(trimmed non-empty string nullable)[]': [ 'abc', 'def', null ],
+        '(integer)[]': [ 123, 456 ],
+        '(integer nullable)[]': [ 123, 456, null ],
+        '(float)[]': [ 0.5, -100.2 ],
+        '(float nullable)[]': [ 0.5, -100.2, null ],
+        '(boolean)[]': [ true, false ],
+        '(boolean nullable)[]': [ true, false, null ],
+        '(optional provided)[]': [ 'abc', 'def' ],
+        '(optional nullable provided)[]': [ 'abc', 'def', null ]
     })
 }

@@ -45,11 +45,6 @@
             readonly array: number[]; 
         }; 
     };
-    readonly optional?: string,
-    readonly 'optional provided'?: string,
-    readonly 'optional nulled provided'?: string | null,
-    readonly 'optional nullable'?: string | null,
-    readonly 'optional nullable provided'?: string | null,
 
     readonly '(uuid)[]': `${string}-${string}-${string}-${string}-${string}`[]; 
     readonly '(uuid nullable)[]': (`${string}-${string}-${string}-${string}-${string}` | null)[]; 
@@ -71,6 +66,13 @@
     readonly '(float nullable)[]': (number | null)[]; 
     readonly '(boolean)[]': boolean[]; 
     readonly '(boolean nullable)[]': (boolean | null)[]; 
+    
+    readonly optional?: string;
+    readonly "optional provided"?: string;
+    readonly "optional nulled provided"?: string | null;
+    readonly "optional nullable"?: string | null;
+    readonly "optional nullable provided"?: string | null;
+    
     readonly "(optional)[]"?: string[]; 
     readonly "(optional provided)[]"?: string[]; 
     readonly "(optional nullable)[]"?: (string | null)[]; 

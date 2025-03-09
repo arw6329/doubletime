@@ -7,6 +7,8 @@ import { getTypes } from './tests/get-typescript-type'
 import fs from 'fs'
 import path from 'path'
 import { Schema } from './Validation/SchemaValidation'
+import { IntegerValidator } from './Validation/Validators/IntegerValidator'
+import { BooleanValidator } from './Validation/Validators/BooleanValidator'
 
 describe('object-schema-validation package', () => {
     const types = getTypes(path.join(__dirname, 'entrypoint.test.ts'))
@@ -127,16 +129,64 @@ describe('object-schema-validation package', () => {
                 }
             }
         } as unknown)
-        expect(types['typedDeepNestedObject']).toEqual('{ a: { b: { c: number }; }; }')
+        expect(types['typedDeepNestedObject']).toEqual('{ a: { b: { c: number; }; }; }')
     })
 
-    it('types non-shorthand array syntax correctly', () => {
+    it('types a mix of shorthand validators, explicit validators, and multiple array syntaxes correctly', () => {
+        /** @export tempTestNewSchema */
+        let test: Schema<{
+            a: {
+                b: {
+                    c: 'int',
+                    d: ['int'],
+                    e: [IntegerValidator]
+                },
+                f: {
+                    [nullable]: true,
+                    a: 'int?'
+                },
+                'g?': 'int?[]',
+                'h?': 'string',
+                'i?': {
+                    j: BooleanValidator,
+                    k: {
+                        l: 'float?'
+                    }
+                }
+            }
+        }>
+        expect(types['tempTestNewSchema']).toEqual(
+            `{
+                a: {
+                    b: {
+                        c: number;
+                        d: number[];
+                        e: number[];
+                    };
+                    f: {
+                        a: number | null;
+                    } | null;
+                    g?: (number | null)[];
+                    h?: string;
+                    i?: {
+                        j: boolean;
+                        k: {
+                            l: number | null;
+                        };
+                    };
+                };
+            }`.replaceAll(/\s+/g, ' ')
+        )
+    })
+
+    it('validates and types non-shorthand array syntax correctly', () => {
         /** @export arraySyntax */
         const typedObject = validate({
             a: [ 'int' ]
         }, {
             a: [ 1 ]
         } as unknown)
+        expect(typedObject).toEqual({ a: [ 1 ] })
         expect(types['arraySyntax']).toEqual('{ a: number[]; }')
     })
 })

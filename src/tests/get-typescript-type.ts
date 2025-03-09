@@ -11,11 +11,7 @@ export function getTypes(filepath: string): Types {
 	const { config } = ts.readConfigFile(configFile, ts.sys.readFile)
 	const { options, fileNames, errors } = ts.parseJsonConfigFileContent(config, ts.sys, projectDir)
     const program = ts.createProgram({ 
-        options: {
-            ...options,
-            target: ts.ScriptTarget.ESNext,
-            module: ts.ModuleKind.ESNext
-        },
+        options,
         rootNames: fileNames,
         configFileParsingDiagnostics: errors
     })

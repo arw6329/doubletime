@@ -1,15 +1,9 @@
-import type { NullableValidator } from "./Validators/NullableValidator"
 import type { ShorthandValidatorKey, ShorthandValidators } from "./ShorthandValidators"
 import { nullable } from "./Validators/ObjectValidator"
 import { ArrayValidator } from "./Validators/ArrayValidator"
 
 export interface TypeValidator<T> {
     validate(value: unknown): T
-}
-
-type PureConcreteSchema<S> = {
-    [Key in keyof S]:
-        TypeValidator<S[Key]> | PureConcreteSchema<S[Key]>
 }
 
 export type ConcreteSchemaValue = TypeValidator<unknown> | ShorthandValidatorKey | ConcreteSchema | [ ConcreteSchemaValue ]
@@ -21,45 +15,62 @@ export type ConcreteSchema = {
 
 type Empty<T> = keyof T extends never ? T : never
 
-type NormalizedConcreteSchema<CS> = {
-    [Key in keyof CS as Key extends symbol ? never : Key]:
-        CS[Key] extends ShorthandValidatorKey
-        ? (typeof ShorthandValidators)[CS[Key]]
-        : CS[Key] extends TypeValidator<unknown>
-        ? CS[Key]
-        : CS[Key] extends [ShorthandValidatorKey]
-        ? ArrayValidator<(typeof ShorthandValidators)[CS[Key][0]] extends TypeValidator<infer T> ? T : never>
-        : CS[Key] extends [TypeValidator<infer T>]
-        ? ArrayValidator<T>
-        : CS[Key] extends [Record<string | symbol, unknown> & ConcreteSchema]
-        ? ArrayValidator<Schema<CS[Key][0]>>
-        : CS[Key] extends {[nullable]: true}
-        ? NullableValidator<SchemaPreOptionalProcessing<CS[Key]>>
-        : CS[Key] extends Empty<CS[Key]>
-        ? undefined
-        : CS[Key] extends Record<string | symbol, unknown>
-        ? NormalizedConcreteSchema<CS[Key]>
-        : undefined
+type ValiatedType<V> = V extends TypeValidator<infer T> ? T : never
+
+type ProcessShorthand<K> = K extends ShorthandValidatorKey
+    ? (typeof ShorthandValidators)[K] : K
+
+type ProcessShorthandInArray<K> = K extends [ShorthandValidatorKey]
+    ? ArrayValidator<ValiatedType<ProcessShorthand<K[0]>>> : K
+
+type ProcessValidatorInArray<K> = K extends [TypeValidator<infer T>]
+    ? ArrayValidator<T> : K
+
+type ProcessKey<K> = ValiatedType<
+    ProcessShorthand<
+        ProcessShorthandInArray<
+            ProcessValidatorInArray<K>
+        >
+    >
+>
+
+type OnlyNonOptionals<CS> = {
+    [Key in keyof CS as Key extends `${string}?` ? never : Key]: CS[Key]
 }
 
-type SchemaPreOptionalProcessing<ConcreteSchema> = NormalizedConcreteSchema<ConcreteSchema> extends PureConcreteSchema<infer S> ? S : never
+type OnlyOptionals<CS> = {
+    [Key in keyof CS as Key extends `${infer KeyName}?` ? KeyName : never]?: CS[Key]
+}
 
-// https://github.com/microsoft/TypeScript/issues/32562
-type Identity<T> = T;
-type Merge<T> = (
-    T extends any ?
-    Identity<{ [k in keyof T] : T[k] }> :
-    never
-)
+type NullIfCSHasNullableSymbol<CS> = CS extends {[nullable]: true}
+    ? null : never
 
-type SchemaProcessOptionals<S extends SchemaPreOptionalProcessing<unknown>> = Merge<{
-    [Key in keyof S as Key extends `${string}?` ? never : Key]: S[Key]
-} & {
-    [Key in keyof S as Key extends `${infer KeyName}?` ? KeyName : never]?: S[Key]
-}>
+type NeverKeysRemoved<T> = {
+    [K in keyof T as T[K] extends never ? never : K]: T[K];
+}
 
-export type Schema<CS> = CS extends Record<string | symbol, unknown>
-    ? CS extends {[nullable]: true}
-        ? SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>> | null
-        : SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>>
-    : never
+type NoNeverValues<T> = NeverKeysRemoved<T> extends T ? NeverKeysRemoved<T> : never
+
+type NoSymbols<T> = T extends symbol ? never : T
+
+type FlattenHalfSchema<CS> = {
+    [Key in keyof CS as NoSymbols<Key>]: Required<CS>[Key] extends ConcreteSchema
+        ? RecursiveFlattenSchema<CS[Key]>
+        : ProcessKey<CS[Key]>
+}
+
+type RecursiveFlattenSchema<CS> = NoNeverValues<(
+    FlattenHalfSchema<OnlyNonOptionals<CS>> & FlattenHalfSchema<OnlyOptionals<CS>>
+) | NullIfCSHasNullableSymbol<CS>>
+
+type ExpandRecursively<T> = T extends object
+    ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
+    : T;
+
+type DenyNonRecord<T> = T extends Record<symbol | string, unknown> ? T : never
+
+type SchemaFlatEntrypoint<CS> = ExpandRecursively<RecursiveFlattenSchema<DenyNonRecord<CS>>>
+
+export type Schema<CS> = SchemaFlatEntrypoint<CS> extends never
+    ? never
+    : (SchemaFlatEntrypoint<CS> | NullIfCSHasNullableSymbol<CS>)

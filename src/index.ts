@@ -1,1 +1,1 @@
-export { nullable, validate } from "./entrypoint"
+export * from "./entrypoint"

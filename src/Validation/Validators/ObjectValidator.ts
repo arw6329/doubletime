@@ -1,8 +1,34 @@
-import type { Schema, TypeValidator, ConcreteSchema } from "../SchemaValidation"
+import { BadSchemaError, BadTypeError, SchemaValidationError } from "#/errors"
+import type { Schema, TypeValidator, ConcreteSchema, ConcreteSchemaValue } from "../SchemaValidation"
 import { ShorthandValidators } from "../ShorthandValidators"
 
 function isTypeValidator<T>(validator: ConcreteSchema|TypeValidator<T>): validator is TypeValidator<T> {
     return 'validate' in validator && validator.validate instanceof Function
+}
+
+// TODO: not complete
+function isConcreteSchema<T>(concreteSchema: unknown): concreteSchema is ConcreteSchema {
+    return typeof concreteSchema === 'object'
+}
+
+function concreteSchemaValueToValidator(value: ConcreteSchemaValue): TypeValidator<unknown> {
+    if(typeof value === 'string') {
+        if(!(value in ShorthandValidators)) {
+            throw new BadSchemaError(`unknown type "${value}" specified in concrete schema`)
+        }
+        return ShorthandValidators[value]
+    } else if(Array.isArray(value)) {
+        if(value.length !== 1) {
+            throw new BadSchemaError(`array had length not equal to 1`)
+        }
+        return concreteSchemaValueToValidator(value[0])
+    } else if(isTypeValidator(value)) {
+        return value
+    } else if(isConcreteSchema(value)) {
+        return new ObjectValidator(value)
+    } else {
+        throw new BadSchemaError('illegal value provided in concrete schema - not a type string or validator')
+    }
 }
 
 export const nullable = Symbol('whether an object-valued key is nullable')
@@ -25,10 +51,18 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
             }
         }
 
-        if(typeof params !== 'object' || Array.isArray(params) || params === null) {
-            return [null, `value not of expected type`]
+        if(typeof params !== 'object' || Array.isArray(params)) {
+            throw new BadTypeError('object', typeof params)
         }
 
+        if(params === null) {
+            if(this.concreteSchema[nullable] === true) {
+                return [ null as Schema<CS>, null ]
+            } else {
+                throw new BadTypeError('object', 'null') 
+            }
+        }
+        
         const rawParams: UnknownObj = params as UnknownObj
 
         const parsedParams: Schema<CS> = {} as Schema<CS>
@@ -60,44 +94,21 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
             // or missing but marked as "default to null".
             rawParams[key] ??= null
 
-            let concreteSchemaValueAtKey: TypeValidator<unknown> | ConcreteSchema
+            const validator = concreteSchemaValueToValidator(this.concreteSchema[keyWithPossibleQuestionMark])
 
-            const nonNormalizedConcreteSchemaValueAtKey = this.concreteSchema[keyWithPossibleQuestionMark] as ConcreteSchema[keyof ConcreteSchema & string]
+            try {
+                const [value, error] = validator.validate(rawParams[key])
 
-            if(typeof nonNormalizedConcreteSchemaValueAtKey === 'string') {
-                concreteSchemaValueAtKey = ShorthandValidators[nonNormalizedConcreteSchemaValueAtKey]
-
-                if(!concreteSchemaValueAtKey) {
-                    return [null, `unknown type "${nonNormalizedConcreteSchemaValueAtKey}" specified in concrete schema`]
-                }
-            } else {
-                concreteSchemaValueAtKey = nonNormalizedConcreteSchemaValueAtKey
-            }
-
-            if(isTypeValidator(concreteSchemaValueAtKey)) {
-                const [value, error] = concreteSchemaValueAtKey.validate(rawParams[key])
-        
                 if(error !== null) {
-                    return [null, `error during validation of parameter ${String(key)}: ${error}`]
+                    return [null, `error during validation of parameter ${key}: ${error}`]
                 }
-        
-                parsedParams[key as keyof Schema<CS>] = value as Schema<CS>[keyof Schema<CS>]
-            } else {
-                if(concreteSchemaValueAtKey[nullable] === true && rawParams[key] === null) {
-                    // using NullableValidator(ObjectValidator) resulted in infinite recursion in tsc for some reason
-                    parsedParams[key as keyof Schema<CS>] = null as Schema<CS>[keyof Schema<CS>]
-                } else {
-                    // also infinite recursion here if this isn't typed as unknown
-                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                    const subTypeValidator: any = new ObjectValidator(concreteSchemaValueAtKey)
 
-                    const [value, error] = subTypeValidator.validate(params[key as keyof typeof params]) as [null, string] | [unknown, null]
-    
-                    if(error !== null) {
-                        return [null, `error during validation of parameter ${String(key)}: ${error}`]
-                    }
-    
-                    parsedParams[key as keyof Schema<CS>] = value as Schema<CS>[keyof Schema<CS>]
+                (parsedParams as any)[key as keyof Schema<CS>] = value as any
+            } catch(e) {
+                if(e instanceof SchemaValidationError) {
+                    throw new SchemaValidationError(`error in parameter "${key}": ${e.message}`)
+                } else {
+                    throw e
                 }
             }
         }

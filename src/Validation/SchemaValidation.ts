@@ -12,9 +12,11 @@ type PureConcreteSchema<S> = {
         TypeValidator<S[Key]> | PureConcreteSchema<S[Key]>
 }
 
+export type ConcreteSchemaValue = TypeValidator<unknown> | ShorthandValidatorKey | ConcreteSchema | [ ConcreteSchemaValue ]
+
 export type ConcreteSchema = {
     [configKey: symbol]: boolean,
-    [key: string]: TypeValidator<unknown> | ShorthandValidatorKey | ConcreteSchema
+    [key: string]: ConcreteSchemaValue
 }
 
 type Empty<T> = keyof T extends never ? T : never
@@ -26,9 +28,11 @@ type NormalizedConcreteSchema<CS> = {
         : CS[Key] extends TypeValidator<unknown>
         ? CS[Key]
         : CS[Key] extends [ShorthandValidatorKey]
-        ? ArrayValidator<number>
+        ? ArrayValidator<(typeof ShorthandValidators)[CS[Key][0]] extends TypeValidator<infer T> ? T : never>
         : CS[Key] extends [TypeValidator<infer T>]
         ? ArrayValidator<T>
+        : CS[Key] extends [Record<string | symbol, unknown> & ConcreteSchema]
+        ? ArrayValidator<Schema<CS[Key][0]>>
         : CS[Key] extends {[nullable]: true}
         ? NullableValidator<SchemaPreOptionalProcessing<CS[Key]>>
         : CS[Key] extends Empty<CS[Key]>
@@ -54,4 +58,6 @@ type SchemaProcessOptionals<S extends SchemaPreOptionalProcessing<unknown>> = Me
     [Key in keyof S as Key extends `${infer KeyName}?` ? KeyName : never]?: S[Key]
 }>
 
-export type Schema<V> = SchemaProcessOptionals<SchemaPreOptionalProcessing<V>>
+export type Schema<CS> = CS extends {[nullable]: true}
+    ? SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>> | null
+    : SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>>

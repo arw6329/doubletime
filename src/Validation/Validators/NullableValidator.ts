@@ -5,9 +5,9 @@ export class NullableValidator<T> implements TypeValidator<T|null> {
         private validator: TypeValidator<T>
     ) {}
 
-    validate(value: unknown): [value: null, error: string] | [value: T|null, error: null] {
+    validate(value: unknown): T | null {
         if(value === null) {
-            return [null, null]
+            return null
         }
 
         return this.validator.validate(value)

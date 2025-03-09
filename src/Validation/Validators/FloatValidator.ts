@@ -1,11 +1,12 @@
+import { BadTypeError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 
 export class FloatValidator implements TypeValidator<number> {
-    validate(value: unknown): [value: null, error: string] | [value: number, error: null] {
+    validate(value: unknown): number {
         if(typeof value !== 'number') {
-            return [null, 'value not of expected type']
+            throw new BadTypeError('number', typeof value)
         }
 
-        return [value, null]
+        return value
     }
 }

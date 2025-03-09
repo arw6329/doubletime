@@ -1,4 +1,4 @@
-import { BadSchemaError, BadTypeError, SchemaValidationError } from "#/errors"
+import { BadFormatError, BadSchemaError, BadTypeError, SchemaValidationError } from "#/errors"
 import type { Schema, TypeValidator, ConcreteSchema, ConcreteSchemaValue } from "../SchemaValidation"
 import { ShorthandValidators } from "../ShorthandValidators"
 
@@ -7,7 +7,7 @@ function isTypeValidator<T>(validator: ConcreteSchema|TypeValidator<T>): validat
 }
 
 // TODO: not complete
-function isConcreteSchema<T>(concreteSchema: unknown): concreteSchema is ConcreteSchema {
+function isConcreteSchema(concreteSchema: unknown): concreteSchema is ConcreteSchema {
     return typeof concreteSchema === 'object'
 }
 
@@ -42,12 +42,12 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
         private parseStrings: boolean = false
     ) {}
 
-    validate(params: unknown): [value: null, error: string] | [value: Schema<CS>, error: null] {
+    validate(params: unknown): Schema<CS> {
         if(this.parseStrings && typeof params === 'string') {
             try {
                 params = JSON.parse(params)
             } catch(e) {
-                return [null, `string value not a serialized JSON object`]
+                throw new BadFormatError(params as string, 'serialized JSON object')
             }
         }
 
@@ -57,9 +57,9 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
 
         if(params === null) {
             if(this.concreteSchema[nullable] === true) {
-                return [ null as Schema<CS>, null ]
+                return null as Schema<CS>
             } else {
-                throw new BadTypeError('object', 'null') 
+                throw new BadTypeError('object', 'null')
             }
         }
         
@@ -72,7 +72,7 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
             const key = keyWithPossibleQuestionMark.replace(/\?$/, '')
 
             if(!key) {
-                return [null, `empty schema property key names are illegal`]
+                throw new SchemaValidationError(`empty schema property key names are illegal`)
             }
 
             if(!(key in params) || params[key as keyof typeof params] === undefined) {
@@ -85,7 +85,7 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
                 if(!(optionalKeys in this.concreteSchema && this.concreteSchema[optionalKeys] === true)) {
                     // Object is not marked as "missing nullable keys default to null",
                     // so key was required. Raise error
-                    return [null, `required parameter ${String(key)} not provided`]
+                    throw new SchemaValidationError(`required parameter ${String(key)} not provided`)
                 }
             }
 
@@ -97,15 +97,10 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
             const validator = concreteSchemaValueToValidator(this.concreteSchema[keyWithPossibleQuestionMark])
 
             try {
-                const [value, error] = validator.validate(rawParams[key])
-
-                if(error !== null) {
-                    return [null, `error during validation of parameter ${key}: ${error}`]
-                }
-
+                const value: unknown = validator.validate(rawParams[key]) as unknown
                 (parsedParams as any)[key as keyof Schema<CS>] = value as any
             } catch(e) {
-                if(e instanceof SchemaValidationError) {
+                if(e instanceof Error) {
                     throw new SchemaValidationError(`error in parameter "${key}": ${e.message}`)
                 } else {
                     throw e
@@ -113,6 +108,6 @@ export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator
             }
         }
 
-        return [ parsedParams, null ]
+        return parsedParams
     }
 }

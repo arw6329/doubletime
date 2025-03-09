@@ -1,3 +1,4 @@
+import { BadTypeError, SchemaValidationError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 
 export class ArrayValidator<T> implements TypeValidator<Array<T>> {
@@ -5,23 +6,26 @@ export class ArrayValidator<T> implements TypeValidator<Array<T>> {
         private elemValidator: TypeValidator<T>
     ) {}
 
-    validate(value: unknown): [value: null, error: string] | [value: Array<T>, error: null] {
+    validate(value: unknown): Array<T> {
         if(Array.isArray(value)) {
             const parsedArray: Array<T> = []
 
             for(let i = 0; i < value.length; i++) {
-                const [parsedElem, error] = this.elemValidator.validate(value[i])
-
-                if(error !== null) {
-                    return [null, error]
+                try {
+                    const parsedElem = this.elemValidator.validate(value[i])
+                    parsedArray.push(parsedElem)
+                } catch(e) {
+                    if(e instanceof Error) {
+                        throw new SchemaValidationError(`error in array member: ${e.message}`)
+                    } else {
+                        throw e
+                    }
                 }
-
-                parsedArray.push(parsedElem)
             }
 
-            return [parsedArray, null]
+            return parsedArray
         }
 
-        return [null, 'value not of expected type']
+        throw new BadTypeError('array', typeof value)
     }
 }

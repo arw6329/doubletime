@@ -1,3 +1,4 @@
+import { BadFormatError, BadTypeError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 import { StringValidator } from "./StringValidator"
 
@@ -6,27 +7,23 @@ export class UTCDateValidator implements TypeValidator<Date> {
         private parseStrings: boolean
     ) {}
 
-    validate(value: unknown): [value: null, error: string] | [value: Date, error: null] {
+    validate(value: unknown): Date {
         if(value instanceof Date) {
-            return [value, null]
+            return value
         }
 
         if(!this.parseStrings) {
-            return [null, 'value not of expected type']
+            throw new BadTypeError('Date', typeof value)
         }
 
-        const [strValue, error] = new StringValidator(false, true).validate(value)
-
-        if(error !== null) {
-            return [null, error]
-        }
+        const strValue = new StringValidator(false, true).validate(value)
 
         if(!/^\d\d\d\d-\d\d-\d\d$/.test(strValue)) {
-            return [null, 'value not of expected type']
+            throw new BadFormatError(strValue, 'yyyy-mm-dd date string')
         }
     
         const date = new Date(Date.UTC(parseInt(strValue.substring(0, 4)), parseInt(strValue.substring(5, 7)) - 1, parseInt(strValue.substring(8, 10))))
 
-        return [date, null]
+        return date
     }
 }

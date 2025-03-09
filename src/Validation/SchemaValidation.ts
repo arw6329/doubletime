@@ -4,7 +4,7 @@ import { nullable } from "./Validators/ObjectValidator"
 import { ArrayValidator } from "./Validators/ArrayValidator"
 
 export interface TypeValidator<T> {
-    validate(value: unknown): [value: T, error: null] | [value: null, error: string]
+    validate(value: unknown): T
 }
 
 type PureConcreteSchema<S> = {

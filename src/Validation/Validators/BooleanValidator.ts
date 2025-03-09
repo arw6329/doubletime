@@ -1,3 +1,4 @@
+import { BadFormatError, BadTypeError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 import { StringValidator } from "./StringValidator"
 
@@ -6,37 +7,33 @@ export class BooleanValidator implements TypeValidator<boolean> {
         private acceptBooleanLike: boolean = false
     ) {}
 
-    validate(value: unknown): [value: null, error: string] | [value: boolean, error: null] {
+    validate(value: unknown): boolean {
         if(value === true || value === false) {
-            return [value, null]
+            return value
         }
 
         if(!this.acceptBooleanLike) {
-            return [null, 'value not of expected type']
+            throw new BadTypeError('boolean', typeof value)
         }
 
         if(typeof value === 'number') {
             if(value === 0) {
-                return [false, null]
+                return false
             } else if(value === 1) {
-                return [true, null]
+                return true
             } else {
-                return [null, 'value not of expected type']
+                throw new BadFormatError(value.toString(), 'boolean-like number (0 or 1)')
             }
         }
 
-        const [strValue, error] = new StringValidator(false, true).validate(value)
-
-        if(error !== null) {
-            return [null, error]
-        }
+        const strValue = new StringValidator(false, true).validate(value)
 
         if(strValue === 'true' || strValue === '1') {
-            return [true, null]
+            return true
         } else if(strValue === 'false' || strValue === '0') {
-            return [false, null]
+            return false
         } else {
-            return [null, 'value not of expected type']
+            throw new BadFormatError(strValue, 'boolean-like string ("true" or "false" or "0" or "1")')
         }
     }
 }

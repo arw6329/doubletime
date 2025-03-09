@@ -1,3 +1,4 @@
+import { BadFormatError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 import { StringValidator } from "./StringValidator"
 
@@ -6,19 +7,16 @@ export class StringBackedEnumValidator<E extends { [key: number]: string }> impl
         private enumObj: E
     ) {}
     
-    validate(value: unknown): [value: null, error: string] | [value: E[keyof E], error: null] {
-        const [strValue, error] = new StringValidator(false, false).validate(value)
-
-        if(error !== null) {
-            return [null, error]
-        }
+    validate(value: unknown): E[keyof E] {
+        const strValue = new StringValidator(false, false).validate(value)
 
         for(const value of Object.values(this.enumObj) as Array<E[keyof E]>) {
             if(value === strValue) {
-                return [value as E[keyof E], null]
+                return value as E[keyof E]
             }
         }
 
-        return [null, 'value was not a member of enum']
+        // TODO
+        throw new BadFormatError(strValue, 'enum')
     }
 }

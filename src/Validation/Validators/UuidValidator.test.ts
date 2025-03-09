@@ -5,21 +5,20 @@ describe('UuidValidator', () => {
     it('accepts valid uuid', () => {
         const validator = new UuidValidator
         const uuid = crypto.randomUUID()
-        expect(validator.validate(uuid as unknown)).toEqual([uuid, null])
+        expect(validator.validate(uuid as unknown)).toBe(uuid)
     })
 
     it('rejects non-string values', () => {
         const validator = new UuidValidator
-        const expectedResult = [null, 'value not of expected type']
-        expect(validator.validate(123 as unknown)).toEqual(expectedResult)
-        expect(validator.validate(false as unknown)).toEqual(expectedResult)
-        expect(validator.validate(null as unknown)).toEqual(expectedResult)
-        expect(validator.validate({} as unknown)).toEqual(expectedResult)
+        expect(() => validator.validate(123 as unknown)).toThrow('bad type')
+        expect(() => validator.validate(false as unknown)).toThrow('bad type')
+        expect(() => validator.validate(null as unknown)).toThrow('bad type')
+        expect(() => validator.validate({} as unknown)).toThrow('bad type')
     })
 
     it('rejects non-uuid strings', () => {
         const validator = new UuidValidator
-        expect(validator.validate('abc' as unknown)).toEqual([null, 'value was not a valid uuid'])
-        expect(validator.validate('' as unknown)).toEqual([null, 'value must not be empty'])
+        expect(() => validator.validate('abc' as unknown)).toThrow('not a valid uuid')
+        expect(() => validator.validate('' as unknown)).toThrow('empty string is not accepted')
     })
 })

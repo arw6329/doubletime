@@ -1,15 +1,16 @@
+import { BadFormatError, BadTypeError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 
 export class IntegerValidator implements TypeValidator<number> {
-    validate(value: unknown): [value: null, error: string] | [value: number, error: null] {
+    validate(value: unknown): number {
         if(typeof value !== 'number') {
-            return [null, 'value not of expected type']
+            throw new BadTypeError('number', typeof value)
         }
 
         if(!Number.isInteger(value)) {
-            return [null, 'decimal values are not accepted']
+            throw new BadFormatError(value.toString(), 'integer')
         }
 
-        return [value, null]
+        return value
     }
 }

@@ -1,3 +1,4 @@
+import { BadFormatError, BadTypeError, SchemaValidationError } from "#/errors"
 import type { TypeValidator } from "../SchemaValidation"
 
 export class StringValidator implements TypeValidator<string> {
@@ -6,9 +7,9 @@ export class StringValidator implements TypeValidator<string> {
         private trim: boolean
     ) {}
 
-    validate(value: unknown): [value: null, error: string] | [value: string, error: null] {
+    validate(value: unknown): string {
         if(typeof value !== 'string') {
-            return [null, 'value not of expected type']
+            throw new BadTypeError('string', typeof value)
         }
 
         let strValue = value
@@ -18,9 +19,9 @@ export class StringValidator implements TypeValidator<string> {
         }
 
         if(!this.acceptEmpty && strValue === '') {
-            return [null, 'value must not be empty']
+            throw new SchemaValidationError('empty string is not accepted')
         }
 
-        return [strValue, null]
+        return strValue
     }
 }

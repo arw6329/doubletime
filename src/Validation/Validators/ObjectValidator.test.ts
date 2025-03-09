@@ -20,27 +20,30 @@ function expectedObject() {
 describe('ObjectValidator', () => {
     it('accepts valid objects', () => {
         const validator = new ObjectValidator(concreteSchema, false)
-        expect(validator.validate(testObject() as unknown)).toEqual([expectedObject(), null])
+        expect(validator.validate(testObject() as unknown)).toEqual(expectedObject())
     })
 
     it('rejects non-object values', () => {
         const validator = new ObjectValidator(concreteSchema, false)
-        const expectedResult = [null, 'value not of expected type']
-        expect(validator.validate(123 as unknown)).toEqual(expectedResult)
-        expect(validator.validate('abc' as unknown)).toEqual(expectedResult)
-        expect(validator.validate(false as unknown)).toEqual(expectedResult)
-        expect(validator.validate(null as unknown)).toEqual(expectedResult)
-        expect(validator.validate([] as unknown)).toEqual(expectedResult)
+        expect(() => validator.validate(123 as unknown)).toThrow('bad type')
+        expect(() => validator.validate('abc' as unknown)).toThrow('bad type')
+        expect(() => validator.validate(false as unknown)).toThrow('bad type')
+        expect(() => validator.validate(null as unknown)).toThrow('bad type')
+        expect(() => validator.validate([] as unknown)).toThrow('bad type')
     })
 
     it('parses JSON strings when specified', () => {
         const validator = new ObjectValidator(concreteSchema, true)
-        expect(validator.validate(JSON.stringify(testObject()) as unknown)).toEqual([expectedObject(), null])
+        expect(validator.validate(JSON.stringify(testObject()) as unknown)).toEqual(expectedObject())
     })
 
     it('does not parse JSON strings when specified', () => {
         const validator = new ObjectValidator(concreteSchema, false)
-        const expectedResult = [null, 'value not of expected type']
-        expect(validator.validate(JSON.stringify(testObject()) as unknown)).toEqual(expectedResult)
+        expect(() => validator.validate(JSON.stringify(testObject()) as unknown)).toThrow('bad type')
+    })
+
+    it('rejects invalid JSON', () => {
+        const validator = new ObjectValidator(concreteSchema, true)
+        expect(() => validator.validate('wow!' as unknown)).toThrow('not a valid serialized JSON object')
     })
 })

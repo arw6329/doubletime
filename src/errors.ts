@@ -7,6 +7,15 @@ export class BadTypeError extends SchemaValidationError {
         expectedType: string,
         foundType: string
     ) {
-        super(`Bad type; expected "${expectedType}", got "${foundType}"`)
+        super(`bad type; expected "${expectedType}", got "${foundType}"`)
+    }
+}
+
+export class BadFormatError extends SchemaValidationError {
+    constructor(
+        value: string,
+        expectedFormat: string
+    ) {
+        super(`value "${value}" not a valid ${expectedFormat}`)
     }
 }

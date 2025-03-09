@@ -1,0 +1,78 @@
+{
+    readonly uuid: `${string}-${string}-${string}-${string}-${string}`;
+    readonly 'uuid nulled': `${string}-${string}-${string}-${string}-${string}` | null;
+    readonly 'uuid nullable': `${string}-${string}-${string}-${string}-${string}` | null;
+    readonly string: string; 
+    readonly 'string nulled': string | null;
+    readonly 'string nullable': string | null;
+    readonly 'empty string': string; 
+    readonly 'empty string nulled': string | null; 
+    readonly 'empty string nullable': string | null; 
+    readonly 'trimmed string': string; 
+    readonly 'trimmed string nulled': string | null; 
+    readonly 'trimmed string nullable': string | null; 
+    readonly 'non-empty string': string; 
+    readonly 'non-empty string nulled': string | null; 
+    readonly 'non-empty string nullable': string | null; 
+    readonly 'trimmed non-empty string': string; 
+    readonly 'trimmed non-empty string nulled': string | null; 
+    readonly 'trimmed non-empty string nullable': string | null; 
+    readonly integer: number; 
+    readonly 'integer nulled': number | null; 
+    readonly 'integer nullable': number | null; 
+    readonly float: number; 
+    readonly 'float nulled': number | null; 
+    readonly 'float nullable': number | null; 
+    readonly boolean: boolean; 
+    readonly 'boolean nulled': boolean | null; 
+    readonly 'boolean nullable': boolean | null; 
+    readonly object: {
+        readonly a: number; 
+        readonly b: string; 
+        readonly c: boolean; 
+    }; 
+    readonly 'object nulled': {
+        readonly d: number; 
+    } | null; 
+    readonly 'object nullable': {
+        readonly e: number; 
+    } | null; 
+    readonly 'nested object parent': {
+        readonly 'nested object child': {
+            readonly a: number; 
+            readonly b: string; 
+            readonly c: boolean; 
+            readonly array: number[]; 
+        }; 
+    };
+    readonly optional?: string,
+    readonly 'optional provided'?: string,
+    readonly 'optional nulled provided'?: string | null,
+    readonly 'optional nullable'?: string | null,
+    readonly 'optional nullable provided'?: string | null,
+
+    readonly '(uuid)[]': `${string}-${string}-${string}-${string}-${string}`[]; 
+    readonly '(uuid nullable)[]': (`${string}-${string}-${string}-${string}-${string}` | null)[]; 
+    readonly '(uuid nullable)[] nulled': (`${string}-${string}-${string}-${string}-${string}` | null)[] | null; 
+    readonly '(uuid nullable)[] nullable': (`${string}-${string}-${string}-${string}-${string}` | null)[] | null; 
+    readonly '(string)[]': string[]; 
+    readonly '(string nullable)[]': (string | null)[]; 
+    readonly '(empty string)[]': string[]; 
+    readonly '(empty string nullable)[]': (string | null)[]; 
+    readonly '(trimmed string)[]': string[]; 
+    readonly '(trimmed string nullable)[]': (string | null)[]; 
+    readonly '(non-empty string)[]': string[]; 
+    readonly '(non-empty string nullable)[]': (string | null)[]; 
+    readonly '(trimmed non-empty string)[]': string[]; 
+    readonly '(trimmed non-empty string nullable)[]': (string | null)[]; 
+    readonly '(integer)[]': number[]; 
+    readonly '(integer nullable)[]': (number | null)[]; 
+    readonly '(float)[]': number[]; 
+    readonly '(float nullable)[]': (number | null)[]; 
+    readonly '(boolean)[]': boolean[]; 
+    readonly '(boolean nullable)[]': (boolean | null)[]; 
+    readonly "(optional)[]"?: string[]; 
+    readonly "(optional provided)[]"?: string[]; 
+    readonly "(optional nullable)[]"?: (string | null)[]; 
+    readonly "(optional nullable provided)[]"?: (string | null)[]; 
+}

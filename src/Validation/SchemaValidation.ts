@@ -20,6 +20,9 @@ type ValiatedType<V> = V extends TypeValidator<infer T> ? T : never
 type ProcessShorthand<K> = K extends ShorthandValidatorKey
     ? (typeof ShorthandValidators)[K] : K
 
+type ProcessConcreteSchemaInArray<K> = K extends [ConcreteSchema]
+    ? ArrayValidator<RecursiveFlattenSchema<K[0]>> : K
+
 type ProcessShorthandInArray<K> = K extends [ShorthandValidatorKey]
     ? ArrayValidator<ValiatedType<ProcessShorthand<K[0]>>> : K
 
@@ -28,8 +31,10 @@ type ProcessValidatorInArray<K> = K extends [TypeValidator<infer T>]
 
 type ProcessKey<K> = ValiatedType<
     ProcessShorthand<
-        ProcessShorthandInArray<
-            ProcessValidatorInArray<K>
+        ProcessConcreteSchemaInArray<
+            ProcessShorthandInArray<
+                ProcessValidatorInArray<K>
+            >
         >
     >
 >

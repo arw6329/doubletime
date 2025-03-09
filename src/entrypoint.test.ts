@@ -189,4 +189,32 @@ describe('object-schema-validation package', () => {
         expect(typedObject).toEqual({ a: [ 1 ] })
         expect(types['arraySyntax']).toEqual('{ a: number[]; }')
     })
+
+    it('validates and types arrays of objects correctly', () => {
+        /** @export arraysOfObjects */
+        const typedObject = validate({
+            a: [{
+                b: 'int',
+                c: 'string'
+            }]
+        }, {
+            a: [{
+                b: 1,
+                c: 'abc'
+            }, {
+                b: 2,
+                c: 'def'
+            }]
+        } as unknown)
+        expect(typedObject).toEqual({
+            a: [{
+                b: 1,
+                c: 'abc'
+            }, {
+                b: 2,
+                c: 'def'
+            }]
+        })
+        expect(types['arraysOfObjects']).toEqual('{ a: { b: number; c: string; }[]; }')
+    })
 })

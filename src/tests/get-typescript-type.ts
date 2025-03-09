@@ -10,7 +10,27 @@ export function getTypes(filepath: string): Types {
     }
 	const { config } = ts.readConfigFile(configFile, ts.sys.readFile)
 	const { options, fileNames, errors } = ts.parseJsonConfigFileContent(config, ts.sys, projectDir)
-    const program = ts.createProgram({ options, rootNames: fileNames, configFileParsingDiagnostics: errors })
+    const program = ts.createProgram({ 
+        options: {
+            ...options,
+            target: ts.ScriptTarget.ESNext,
+            module: ts.ModuleKind.ESNext
+        },
+        rootNames: fileNames,
+        configFileParsingDiagnostics: errors
+    })
+
+    const emitResult = program.emit()
+    const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics)
+    allDiagnostics.forEach((diagnostic) => {
+        if (diagnostic.file) {
+            const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start!);
+            const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+            console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+        } else {      
+            console.log(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+        }
+    })
 
     const exportedTypes: Types = {}
 
@@ -37,10 +57,13 @@ export function getTypes(filepath: string): Types {
             return
         }
 
-        exportedTypes[exported.text[0].text] = checker.typeToString(
-            checker.getTypeOfSymbolAtLocation(symbol, node),
-            undefined,
-            ts.TypeFormatFlags.NoTruncation
-        )
+        const type = checker.getTypeOfSymbolAtLocation(symbol, node)
+        exportedTypes[exported.text[0].text] = type.flags & ts.TypeFlags.Never
+            ? 'never'
+            : checker.typeToString(
+                type,
+                undefined,
+                ts.TypeFormatFlags.NoTruncation
+            )
     }
 }

@@ -58,6 +58,8 @@ type SchemaProcessOptionals<S extends SchemaPreOptionalProcessing<unknown>> = Me
     [Key in keyof S as Key extends `${infer KeyName}?` ? KeyName : never]?: S[Key]
 }>
 
-export type Schema<CS> = CS extends {[nullable]: true}
-    ? SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>> | null
-    : SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>>
+export type Schema<CS> = CS extends Record<string | symbol, unknown>
+    ? CS extends {[nullable]: true}
+        ? SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>> | null
+        : SchemaProcessOptionals<SchemaPreOptionalProcessing<CS>>
+    : never

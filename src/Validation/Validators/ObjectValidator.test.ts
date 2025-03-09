@@ -1,19 +1,32 @@
 import { describe, expect, it } from '@jest/globals'
 import { ObjectValidator } from './ObjectValidator'
+import { IntegerValidator } from './IntegerValidator'
 
 const concreteSchema = {
-    'uuid': 'uuid'
+    'uuid': 'uuid',
+    'intArrayShort': 'int[]',
+    'intArrayLong': [ 'int' ] as [ 'int' ],
+    'intArrayLonger': [ new IntegerValidator ] as [ IntegerValidator ],
+    'intDirectValidator': new IntegerValidator
 } as const
 
 function testObject() {
     return structuredClone({
-        'uuid': '351c1982-d597-42bd-ba57-0f49b8ff7c0d'
+        'uuid': '351c1982-d597-42bd-ba57-0f49b8ff7c0d',
+        'intArrayShort': [ 1 ],
+        'intArrayLong': [ 2, 3, 4 ],
+        'intArrayLonger': [ 5 ],
+        'intDirectValidator': 6
     })
 }
 
 function expectedObject() {
     return structuredClone({
-        'uuid': '351c1982-d597-42bd-ba57-0f49b8ff7c0d'
+        'uuid': '351c1982-d597-42bd-ba57-0f49b8ff7c0d',
+        'intArrayShort': [ 1 ],
+        'intArrayLong': [ 2, 3, 4 ],
+        'intArrayLonger': [ 5 ],
+        'intDirectValidator': 6
     })
 }
 

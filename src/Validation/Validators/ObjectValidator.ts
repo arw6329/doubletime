@@ -1,6 +1,7 @@
 import { BadFormatError, BadSchemaError, BadTypeError, SchemaValidationError } from "#/errors"
 import type { Schema, TypeValidator, ConcreteSchema, ConcreteSchemaValue } from "../SchemaValidation"
 import { ShorthandValidators } from "../ShorthandValidators"
+import { ArrayValidator } from "./ArrayValidator"
 
 function isTypeValidator<T>(validator: ConcreteSchema|TypeValidator<T>): validator is TypeValidator<T> {
     return 'validate' in validator && validator.validate instanceof Function
@@ -21,7 +22,7 @@ function concreteSchemaValueToValidator(value: ConcreteSchemaValue): TypeValidat
         if(value.length !== 1) {
             throw new BadSchemaError(`array had length not equal to 1`)
         }
-        return concreteSchemaValueToValidator(value[0])
+        return new ArrayValidator(concreteSchemaValueToValidator(value[0]))
     } else if(isTypeValidator(value)) {
         return value
     } else if(isConcreteSchema(value)) {

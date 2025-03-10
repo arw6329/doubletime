@@ -9,6 +9,7 @@ import path from 'path'
 import { Schema } from './Validation/SchemaValidation'
 import { IntegerValidator } from './Validation/Validators/IntegerValidator'
 import { BooleanValidator } from './Validation/Validators/BooleanValidator'
+import { compressWhitespace } from './tests/compress-whitespace'
 
 describe('object-schema-validation package', () => {
     const types = getTypes(path.join(__dirname, 'entrypoint.test.ts'))
@@ -20,9 +21,9 @@ describe('object-schema-validation package', () => {
     })
 
     it('infers type correctly', () => {
-        const expectedType = fs.readFileSync(
+        const expectedType = compressWhitespace(fs.readFileSync(
             path.join(__dirname, 'tests', 'test-objects', 'expected-type.txt')
-        ).toString('utf-8').replaceAll(/\s+/g, ' ')
+        ).toString('utf-8'))
         expect(types['typedObject']).toBe(expectedType)
     })
 
@@ -156,7 +157,7 @@ describe('object-schema-validation package', () => {
             }
         }>
         expect(types['tempTestNewSchema']).toEqual(
-            `{
+            compressWhitespace(`{
                 a: {
                     b: {
                         c: number;
@@ -175,7 +176,7 @@ describe('object-schema-validation package', () => {
                         };
                     };
                 };
-            }`.replaceAll(/\s+/g, ' ')
+            }`)
         )
     })
 

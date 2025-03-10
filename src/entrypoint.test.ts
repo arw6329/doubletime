@@ -11,7 +11,7 @@ import { IntegerValidator } from './Validation/Validators/IntegerValidator'
 import { BooleanValidator } from './Validation/Validators/BooleanValidator'
 import { compressWhitespace } from './tests/compress-whitespace'
 
-describe('object-schema-validation package', () => {
+describe('doubletime package', () => {
     const types = getTypes(path.join(__dirname, 'entrypoint.test.ts'))
 
     it('accepts valid objects', () => {

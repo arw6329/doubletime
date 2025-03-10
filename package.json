@@ -1,5 +1,5 @@
 {
-    "name": "object-schema-validation",
+    "name": "doubletime",
     "version": "1.0.0",
     "description": "Validate object schemas with compile-time and runtime type safety",
     "module": "dist/index.js",
@@ -15,7 +15,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/arw6329/object-schema-validation.git"
+        "url": "git+https://github.com/arw6329/doubletime.git"
     },
     "keywords": [
         "schemas",
@@ -28,9 +28,9 @@
     "author": "",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/arw6329/object-schema-validation/issues"
+        "url": "https://github.com/arw6329/doubletime/issues"
     },
-    "homepage": "https://github.com/arw6329/object-schema-validation#readme",
+    "homepage": "https://github.com/arw6329/doubletime#readme",
     "devDependencies": {
         "@jest/globals": "^29.7.0",
         "@rollup/plugin-terser": "^0.4.4",

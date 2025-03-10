@@ -1,32 +1,27 @@
-# object-schema-validation
+# Doubletime - validate object schemas at runtime with compile-time type inference
 
-Simple and straightforward library to validate objects against a provided schema at runtime with compile-time type safety
+Simple and straightforward library to validate TypeScript objects against a schema at runtime with compile-time type safety (a.k.a. doubletime!).
 
 ```ts
-import { object } from 'object-schema-validation'
+import { object } from 'doubletime'
 
-const untypedObject: unknown = JSON.parse(`
-    {
-        "profileId": "5ca28d8c-a909-4900-9ffb-afb14a28dbd3",
-        "name": "Eva Williams",
-        "age": 23,
-        "bio": null,
-        "comments": [
-            {
-                "text": "Easily parse objects with compile-time type safety!"
-            },
-            {
-                "text": "Perfect for parsing API request bodies",
-                "edits": [
-                    {
-                        "text": "Or providing intellisense hints for db data while enforcing expected schemas at runtime"
-                    }
-                ]
-            }
-        ]
-    }
-`)
+const untypedObject: unknown = JSON.parse(`{
+    "profileId": "5ca28d8c-a909-4900-9ffb-afb14a28dbd3",
+    "name": "Eva Williams",
+    "age": 23,
+    "bio": null,
+    "comments": [{
+        "text": "Easily parse objects with compile-time type safety!"
+    }, {
+        "text": "Perfect for parsing API request bodies",
+        "edits": [{
+            "text": "Or providing IntelliSense hints for db data while enforcing expected schemas at runtime"
+        }]
+    }]
+}`)
 
+// Type will be inferred from schema, so you get
+// IntelliSense code completion and compile-time safety 
 const typedObject = object({
     profileId: 'uuid',
     name: 'string',
@@ -53,7 +48,7 @@ const typedObject = object({
 //     }[];
 // }
 
-// typescript does not complain here
+// TypeScript does not complain here
 typedObject.name
 typedObject.comments[1].edits?.[0].text
 ```
@@ -79,7 +74,7 @@ typedObject.comments[1].edits?.[0].text
 ## Install
 
 ```
-npm install object-schema-validation
+npm install doubletime
 ```
 
 ## Basic usage
@@ -87,7 +82,7 @@ npm install object-schema-validation
 This project provides a number of *validators* for assorted data types. Validators are objects that contain a `validate()` function that accepts arbitrary data and returns the data in a strongly-typed form, sometimes modified, if the data is considered valid. For example, an integer validator can be obtained with `int()`, which returns the value passed to `validate()` if it is a javascript `number` primitive and a whole number:
 
 ```ts
-import { int } from 'object-schema-validation'
+import { int } from 'doubletime'
 
 // typeof typedInt is number
 const typedInt = int().validate(parseInt('123') as unknown)
@@ -103,7 +98,7 @@ const typedInt = int().validate('wow!')
 The most important validator is `object()`, which accepts an object whose values are validators and can be used to verify the schema of an entire object:
 
 ```ts
-import { object, string, int } from 'object-schema-validation'
+import { object, string, int } from 'doubletime'
 
 const validator = object({
     name: string(),
@@ -137,7 +132,7 @@ const typedObject = validator.validate(
 )
 ```
 
-While you can explicitly specify the validator for each property, object-schema-validation also allows you to use shorthand type specifications in the form of strings in most circumstances. The above example can also be written like so:
+While you can explicitly specify the validator for each property, doubletime also allows you to use shorthand type specifications in the form of strings in most circumstances. The above example can also be written like so:
 
 ```ts
 const validator = object({
@@ -168,7 +163,7 @@ The specification for an object's structure passed to the `object()` call is cal
 The typescript type of a valid object corresponding to a particular concrete schema can be obtained using `Schema<typeof concreteSchema>`. For example:
 
 ```ts
-import { object, type Schema } from 'object-schema-validation'
+import { object, type Schema } from 'doubletime'
 
 const personSchema = {
     name: 'string',
@@ -219,7 +214,7 @@ printPersonDetails(person)
 Use `'string'` or `string()` to enforce an object key is a string:
 
 ```ts
-import { object, string } from 'object-schema-validation'
+import { object, string } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: string;
@@ -239,7 +234,7 @@ const typedObject = object({
 You can use the value `'non-empty string'` to enforce a string-valued object key is non-empty:
 
 ```ts
-import { object } from 'object-schema-validation'
+import { object } from 'doubletime'
 
 const validator = object({
     abc: 'non-empty string'
@@ -267,7 +262,7 @@ const typedObject2 = validator.validate({
 You can use `'trimmed string'` or `'trimmed non-empty string'` to automatically trim whitespace from both ends of a string:
 
 ```ts
-import { object, string } from 'object-schema-validation'
+import { object, string } from 'doubletime'
 
 // typedObject1 is {
 //     abc: 'Hello',
@@ -297,7 +292,7 @@ const typedObject2 = object({
 Use `'uuid'` or `uuid()` to enforce a string is a valid uuid:
 
 ```ts
-import { object, uuid } from 'object-schema-validation'
+import { object, uuid } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: `${string}-${string}-${string}-${string}-${string}`;
@@ -319,7 +314,7 @@ The type of a uuid key is assignable to `string` but a little more specific usin
 Use `'int'`, `integer` or `int()` to enforce an object key is an integer:
 
 ```ts
-import { object, int } from 'object-schema-validation'
+import { object, int } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number;
@@ -353,7 +348,7 @@ const typedObject = object({
 Use `'float'` or `float()` to enforce an object key is a floating point number:
 
 ```ts
-import { object, float } from 'object-schema-validation'
+import { object, float } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number;
@@ -387,7 +382,7 @@ const typedObject = object({
 Use `'boolean'` or `bool()` to enforce an object key is a boolean:
 
 ```ts
-import { object, bool } from 'object-schema-validation'
+import { object, bool } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: boolean;
@@ -407,7 +402,7 @@ const typedObject = object({
 Any of the string-based schema values can be made into arrays by appending `[]` after the type:
 
 ```ts
-import { object } from 'object-schema-validation'
+import { object } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number[];
@@ -428,7 +423,7 @@ const typedObject = object({
 Alternatively, you can wrap any validator or shorthand type string in an actual array (this only works one level deep):
 
 ```js
-import { object, bool } from 'object-schema-validation'
+import { object, bool } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number[];
@@ -449,7 +444,7 @@ const typedObject = object({
 Alternatively, you can use the `array()` function and pass it a validator that will be used for the component elements:
 
 ```js
-import { object, array, int } from 'object-schema-validation'
+import { object, array, int } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number[];
@@ -464,7 +459,7 @@ const typedObject = object({
 `array()` validators can be nested to arbitrary depth:
 
 ```js
-import { object, array, int } from 'object-schema-validation'
+import { object, array, int } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number[][][];
@@ -481,7 +476,7 @@ const typedObject = object({
 Any of the string-based schema values can be marked nullable by adding a question mark after them:
 
 ```ts
-import { object } from 'object-schema-validation'
+import { object } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number | null;
@@ -502,7 +497,7 @@ const typedObject = object({
 Arrays can have only their elements marked as nullable by including the question mark before the square brackets, or the entire array-valued key itself can be marked nullable by including the question mark after the brackets:
 
 ```ts
-import { object } from 'object-schema-validation'
+import { object } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: (number | null)[];
@@ -523,7 +518,7 @@ const typedObject = object({
 Object-valued keys can be marked nullable by importing the `nullable` symbol and setting it to true on the nullable object: 
 
 ```ts
-import { object, nullable } from 'object-schema-validation'
+import { object, nullable } from 'doubletime'
 
 const validator = object({
     someObject: {
@@ -560,7 +555,7 @@ const typedObject2 = validator.validate({
 Alternatively, wrap any validator in a call to `maybe()` to make it nullable:
 
 ```ts
-import { object, maybe, int } from 'object-schema-validation'
+import { object, maybe, int } from 'doubletime'
 
 // typeof typedObject is {
 //     abc: number | null;
@@ -577,7 +572,7 @@ const typedObject = object({
 Keys whose names end in a question mark are optional. The question mark is not expected to be present in the key name at runtime:
 
 ```ts
-import { object } from 'object-schema-validation'
+import { object } from 'doubletime'
 
 const validator = object({
     'optionalString?': 'string',
@@ -603,4 +598,4 @@ const typedObject2 = validator.validate({
 
 ## License
 
-object-schema-validation is licensed under the MIT license.
+doubletime is licensed under the MIT license.

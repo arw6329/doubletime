@@ -596,6 +596,17 @@ const typedObject2 = validator.validate({
 })
 ```
 
+## TODO/Planned features
+
+- Custom type validators
+- safeValidate() alternative that returns { typedObject } | { error } instead of throwing errors on validation failure
+- Email validator
+- Ability to specify min/max for numeric validators, min/max length for string validators, etc.
+- Union and intersection validators
+- Support parsing strings for int()/float()/object()
+- Boolean-like validators (accepting integers 0/1, etc.)
+- Date validators (yyyy-mm-dd UTC date and yyyy-mm-dd hh:mm:ss UTC timestamp formats)
+
 ## License
 
 doubletime is licensed under the MIT license.

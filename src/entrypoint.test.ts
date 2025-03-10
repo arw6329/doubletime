@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { nullable, validate } from './entrypoint'
+import { object, nullable } from './entrypoint'
 import { concreteSchema } from './tests/test-objects/concrete-schema'
 import { testObject } from './tests/test-objects/test-object'
 import { expectedObject } from './tests/test-objects/expected-object'
@@ -16,7 +16,7 @@ describe('object-schema-validation package', () => {
 
     it('accepts valid objects', () => {
         /** @export typedObject */
-        const typedObject = validate(concreteSchema, testObject() as unknown)
+        const typedObject = object(concreteSchema).validate(testObject() as unknown)
         expect(typedObject).toEqual(expectedObject())
     })
 
@@ -103,11 +103,11 @@ describe('object-schema-validation package', () => {
 
     it('types nested objects correctly', () => {
         /** @export typedNestedObject */
-        const typedObject = validate({
+        const typedObject = object({
             a: {
                 b: 'int'
             }
-        }, {
+        }).validate({
             a: {
                 b: 1
             }
@@ -117,13 +117,13 @@ describe('object-schema-validation package', () => {
 
     it('types deeply nested objects correctly', () => {
         /** @export typedDeepNestedObject */
-        const typedObject = validate({
+        const typedObject = object({
             a: {
                 b: {
                     c: 'int'
                 }
             }
-        }, {
+        }).validate({
             a: {
                 b: {
                     c: 1
@@ -182,9 +182,9 @@ describe('object-schema-validation package', () => {
 
     it('validates and types non-shorthand array syntax correctly', () => {
         /** @export arraySyntax */
-        const typedObject = validate({
+        const typedObject = object({
             a: [ 'int' ]
-        }, {
+        }).validate({
             a: [ 1 ]
         } as unknown)
         expect(typedObject).toEqual({ a: [ 1 ] })
@@ -193,12 +193,12 @@ describe('object-schema-validation package', () => {
 
     it('validates and types arrays of objects correctly', () => {
         /** @export arraysOfObjects */
-        const typedObject = validate({
+        const typedObject = object({
             a: [{
                 b: 'int',
                 c: 'string'
             }]
-        }, {
+        }).validate({
             a: [{
                 b: 1,
                 c: 'abc'

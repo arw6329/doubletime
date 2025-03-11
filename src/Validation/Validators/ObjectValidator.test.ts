@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { ObjectValidator } from './ObjectValidator'
+import { ObjectValidator, optionalKeys } from './ObjectValidator'
 import { IntegerValidator } from './IntegerValidator'
 
 const concreteSchema = {
@@ -58,5 +58,16 @@ describe('ObjectValidator', () => {
     it('rejects invalid JSON', () => {
         const validator = new ObjectValidator(concreteSchema, true)
         expect(() => validator.validate('wow!' as unknown)).toThrow('not a valid serialized JSON object')
+    })
+
+    it('does not add missing keys to original untyped object', () => {
+        const validator = new ObjectValidator({
+            [optionalKeys]: true,
+            a: 'int?'
+        }, false)
+
+        const untypedObject = {} as unknown
+        validator.validate(untypedObject)
+        expect(typeof (untypedObject as any)['a']).toBe(undefined)
     })
 })

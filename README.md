@@ -643,6 +643,8 @@ const d = validator.validate(15)
 - Boolean-like validators (accepting integers 0/1, etc.)
 - Date validators (yyyy-mm-dd UTC date and yyyy-mm-dd hh:mm:ss UTC timestamp formats)
 
+Feel free to open a GitHub issue to suggest more features.
+
 ## License
 
 doubletime is licensed under the MIT license.

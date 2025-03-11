@@ -5,7 +5,7 @@ import { FloatValidator, FloatValidatorOptions } from "./Validation/Validators/F
 import { IntegerValidator, type IntegerValidatorOptions } from "./Validation/Validators/IntegerValidator";
 import { NullableValidator } from "./Validation/Validators/NullableValidator";
 import { ObjectValidator } from "./Validation/Validators/ObjectValidator";
-import { StringValidator } from "./Validation/Validators/StringValidator";
+import { StringValidator, StringValidatorOptions } from "./Validation/Validators/StringValidator";
 import { UuidValidator } from "./Validation/Validators/UuidValidator";
 
 export function array<T>(elemValidator: TypeValidator<T>): ArrayValidator<T> {
@@ -32,8 +32,8 @@ export function object<CS extends ConcreteSchema>(concreteSchema: CS): ObjectVal
     return new ObjectValidator(concreteSchema)
 }
 
-export function string(): StringValidator {
-    return new StringValidator(true, false)
+export function string(options: StringValidatorOptions = {}): StringValidator {
+    return new StringValidator(options)
 }
 
 export function uuid(): UuidValidator {

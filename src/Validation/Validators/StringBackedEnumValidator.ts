@@ -8,7 +8,7 @@ export class StringBackedEnumValidator<E extends { [key: number]: string }> impl
     ) {}
     
     validate(value: unknown): E[keyof E] {
-        const strValue = new StringValidator(false, false).validate(value)
+        const strValue = new StringValidator({ minLength: 1 }).validate(value)
 
         for(const value of Object.values(this.enumObj) as Array<E[keyof E]>) {
             if(value === strValue) {

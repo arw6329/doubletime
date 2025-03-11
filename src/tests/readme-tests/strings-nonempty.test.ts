@@ -24,6 +24,6 @@ describe('README', () => {
 
         expect(() => validator.validate({
             abc: ''
-        })).toThrow('empty string is not accepted')
+        })).toThrow('value "" is not valid; minimum accepted length is 1')
     })
 })

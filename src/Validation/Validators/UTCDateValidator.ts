@@ -16,7 +16,7 @@ export class UTCDateValidator implements TypeValidator<Date> {
             throw new BadTypeError('Date', typeof value)
         }
 
-        const strValue = new StringValidator(false, true).validate(value)
+        const strValue = new StringValidator({ minLength: 1, trim: true }).validate(value)
 
         if(!/^\d\d\d\d-\d\d-\d\d$/.test(strValue)) {
             throw new BadFormatError(strValue, 'yyyy-mm-dd date string')

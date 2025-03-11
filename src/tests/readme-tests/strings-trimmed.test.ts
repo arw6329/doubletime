@@ -30,6 +30,6 @@ describe('README', () => {
         }).validate({
             abc: '   Hello   ',
             def: '       '
-        })).toThrow('empty string is not accepted')
+        })).toThrow('value "" is not valid; minimum accepted length is 1')
     })
 })

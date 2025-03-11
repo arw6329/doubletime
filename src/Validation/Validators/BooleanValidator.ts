@@ -26,7 +26,7 @@ export class BooleanValidator implements TypeValidator<boolean> {
             }
         }
 
-        const strValue = new StringValidator(false, true).validate(value)
+        const strValue = new StringValidator({ minLength: 1, trim: true }).validate(value)
 
         if(strValue === 'true' || strValue === '1') {
             return true

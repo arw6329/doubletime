@@ -70,6 +70,7 @@ typedObject.comments[1].edits?.[0].text
     - [Nullability](#nullability)
     - [Optionality](#optionality)
 - [Numeric validator options](#numeric-validator-options)
+- [String validator options](#string-validator-options)
 - [TODO/Planned features](#todoplanned-features)
 - [License](#license)
 
@@ -253,7 +254,7 @@ const typedObject1 = validator.validate({
 //     abc: string;
 // }
 //
-// but will throw 'empty string is not accepted' at runtime
+// but will throw 'value "" is not valid; minimum accepted length is 1' at runtime
 const typedObject2 = validator.validate({
     abc: ''
 })
@@ -278,7 +279,7 @@ const typedObject1 = object({
     def: 'world'
 })
 
-// throws 'empty string is not accepted'
+// throws 'value "" is not valid; minimum accepted length is 1'
 // because "def" is empty (after trimming)
 const typedObject2 = object({
     abc: 'trimmed non-empty string',
@@ -629,8 +630,43 @@ const c = validator.validate(10)
 const d = validator.validate('4')
 
 // throws 'value "15" is not valid; maximum accepted value is 10'
-const d = validator.validate(15)
+const e = validator.validate(15)
 ```
+
+## String validator options
+
+String validators support the following options:
+
+- `minLength`: `number`: minimum length of the string
+- `maxLength`: `number`: maximum length of the string
+- `match`: `RegExp`: regular expression the string must match to be considered valid
+- `trim`: `boolean`: whether or not to trim whitespace from each end of the string
+- `ensure`: `(string) => boolean`: custom callback function where you can do arbitrary validation logic 
+- `transform`: `(string) => string`: custom callback function that you can use to transform a string after all other validation has occurred
+
+```ts
+import { string } from 'doubletime'
+
+const usernameValidator = string({
+    minLength: 4,
+    maxLength: 16,
+    trim: true,
+    match: /^[a-z][a-z0-9]*(?:[-_][a-z0-9]+)*$/i,
+    ensure: (string) => string !== 'admin' && string !== 'system',
+    transform: (string) => string.toLowerCase()
+})
+
+// no errors
+const a = usernameValidator.validate('Someone123') // returns "someone123"
+const b = usernameValidator.validate('  Eva-Girl2001 ') // returns "eva-girl2001"
+
+// throws 'value "AVeryLongUsernameHere" is not valid; maximum accepted length is 16'
+const c = validator.validate('AVeryLongUsernameHere')
+// throws 'value "B@d~characters!" is not valid; input must match regular expression /^[a-z][a-z0-9]*(?:[-_][a-z0-9]+)*$/i'
+const d = validator.validate('B@d~characters!')
+```
+
+Note that `transform` occurs after other checks like `minLength/maxLength/ensure` and can return a value that
 
 ## TODO/Planned features
 
@@ -639,6 +675,7 @@ const d = validator.validate(15)
 - Email validator
 - Ability to specify min/max for numeric validators, min/max length for string validators, etc.
 - Union and intersection validators
+- String enum validators
 - Support parsing strings for int()/float()/object()
 - Boolean-like validators (accepting integers 0/1, etc.)
 - Date validators (yyyy-mm-dd UTC date and yyyy-mm-dd hh:mm:ss UTC timestamp formats)

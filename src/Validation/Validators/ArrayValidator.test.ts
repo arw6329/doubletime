@@ -19,7 +19,7 @@ describe('ArrayValidator', () => {
     })
 
     it('accepts arrays of strings', () => {
-        const validator = new ArrayValidator(new StringValidator(false, false))
+        const validator = new ArrayValidator(new StringValidator({ minLength: 1 }))
         expect(validator.validate(['abc', 'def'] as unknown)).toEqual(['abc', 'def'])
         expect(validator.validate([] as unknown)).toEqual([])
     })
@@ -34,7 +34,7 @@ describe('ArrayValidator', () => {
     })
 
     it('rejects arrays of wrong type', () => {
-        const validator = new ArrayValidator(new StringValidator(false, false))
+        const validator = new ArrayValidator(new StringValidator({ minLength: 1 }))
         expect(() => validator.validate(['abc', 'def', 123] as unknown)).toThrow('bad type')
     })
 })

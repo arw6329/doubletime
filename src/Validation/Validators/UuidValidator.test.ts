@@ -19,6 +19,6 @@ describe('UuidValidator', () => {
     it('rejects non-uuid strings', () => {
         const validator = new UuidValidator
         expect(() => validator.validate('abc' as unknown)).toThrow('not a valid uuid')
-        expect(() => validator.validate('' as unknown)).toThrow('empty string is not accepted')
+        expect(() => validator.validate('' as unknown)).toThrow('value "" is not valid; minimum accepted length is 1')
     })
 })

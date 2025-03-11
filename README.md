@@ -69,6 +69,8 @@ typedObject.comments[1].edits?.[0].text
     - [Arrays](#arrays)
     - [Nullability](#nullability)
     - [Optionality](#optionality)
+- [Numeric validator options](#numeric-validator-options)
+- [TODO/Planned features](#todoplanned-features)
 - [License](#license)
 
 ## Install
@@ -311,7 +313,7 @@ The type of a uuid key is assignable to `string` but a little more specific usin
 
 ### Integers
 
-Use `'int'`, `integer` or `int()` to enforce an object key is an integer:
+Use `'int'`, `'integer'` or `int()` to enforce an object key is an integer:
 
 ```ts
 import { object, int } from 'doubletime'
@@ -594,6 +596,40 @@ const typedObject1 = validator.validate({
 const typedObject2 = validator.validate({
     optionalInt: 123
 })
+```
+
+## Numeric validator options
+
+Integer and float validators support the following options:
+
+- `parseStrings`: `boolean`: whether to accept and parse numeric strings (using the global `parseInt` or `parseFloat` function)
+- `min`: `number`: minimum accepted value (inclusive)
+- `max`: `number`: maximum accepted value (inclusive)
+- `ensure`: `(number) => boolean`: custom callback function where you can do arbitrary validation logic 
+
+Integers also accept the following additional option:
+
+- `parity`: `'even' | 'odd'`: parity of the integer
+
+```ts
+import { int } from 'doubletime'
+
+const validator = int({
+    parseStrings: true,
+    min: -6,
+    max: 10,
+    parity: 'even',
+    ensure: (number) => number + 1 === 2 + number - 1
+})
+
+// no errors
+const a = validator.validate(0)
+const b = validator.validate(-6)
+const c = validator.validate(10)
+const d = validator.validate('4')
+
+// throws 'value "15" is not valid; maximum accepted value is 10'
+const d = validator.validate(15)
 ```
 
 ## TODO/Planned features

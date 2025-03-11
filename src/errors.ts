@@ -19,3 +19,12 @@ export class BadFormatError extends SchemaValidationError {
         super(`value "${value}" not a valid ${expectedFormat}`)
     }
 }
+
+export class BadValueError extends SchemaValidationError {
+    constructor(
+        value: string,
+        details: string
+    ) {
+        super(`value "${value}" is not valid; ${details}`)
+    }
+}

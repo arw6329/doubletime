@@ -1,8 +1,8 @@
 import { ConcreteSchema, TypeValidator } from "./Validation/SchemaValidation";
 import { ArrayValidator } from "./Validation/Validators/ArrayValidator";
 import { BooleanValidator } from "./Validation/Validators/BooleanValidator";
-import { FloatValidator } from "./Validation/Validators/FloatValidator";
-import { IntegerValidator } from "./Validation/Validators/IntegerValidator";
+import { FloatValidator, FloatValidatorOptions } from "./Validation/Validators/FloatValidator";
+import { IntegerValidator, type IntegerValidatorOptions } from "./Validation/Validators/IntegerValidator";
 import { NullableValidator } from "./Validation/Validators/NullableValidator";
 import { ObjectValidator } from "./Validation/Validators/ObjectValidator";
 import { StringValidator } from "./Validation/Validators/StringValidator";
@@ -16,12 +16,12 @@ export function bool(): BooleanValidator {
     return new BooleanValidator
 }
 
-export function float(): FloatValidator {
-    return new FloatValidator
+export function float(options: FloatValidatorOptions = {}): FloatValidator {
+    return new FloatValidator(options)
 }
 
-export function int(): IntegerValidator {
-    return new IntegerValidator
+export function int(options: IntegerValidatorOptions = {}): IntegerValidator {
+    return new IntegerValidator(options)
 }
 
 export function maybe<T>(validator: TypeValidator<T>): NullableValidator<T> {

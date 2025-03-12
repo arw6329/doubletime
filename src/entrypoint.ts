@@ -1,3 +1,5 @@
 export { type Schema } from "./Validation/SchemaValidation"
 export { nullable } from "./Validation/Validators/ObjectValidator"
 export * from "./validator-wrappers"
+export { TypeValidator } from "./Validation/TypeValidator"
+export { SchemaValidationError, BadSchemaError, BadTypeError, BadFormatError, BadValueError } from "./errors"

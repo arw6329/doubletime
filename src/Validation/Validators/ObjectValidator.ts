@@ -1,8 +1,10 @@
 import { BadFormatError, BadSchemaError, BadTypeError, SchemaValidationError } from "#/errors"
-import type { Schema, TypeValidator, ConcreteSchema, ConcreteSchemaValue } from "../SchemaValidation"
+import type { Schema, ConcreteSchema, ConcreteSchemaValue } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 import { ShorthandValidators } from "../ShorthandValidators"
 import { ArrayValidator } from "./ArrayValidator"
 
+// TODO: can this just be instanceof TypeValidator?
 function isTypeValidator<T>(validator: ConcreteSchema|TypeValidator<T>): validator is TypeValidator<T> {
     return 'validate' in validator && validator.validate instanceof Function
 }
@@ -37,11 +39,11 @@ export const optionalKeys = Symbol('whether keys marked as nullable are optional
 
 type UnknownObj = { [key: string]: unknown }
 
-export class ObjectValidator<CS extends ConcreteSchema> implements TypeValidator<Schema<CS>> {
+export class ObjectValidator<CS extends ConcreteSchema> extends TypeValidator<Schema<CS>> {
     constructor(
         private concreteSchema: CS,
         private parseStrings: boolean = false
-    ) {}
+    ) { super() }
 
     validate(params: unknown): Schema<CS> {
         if(this.parseStrings && typeof params === 'string') {

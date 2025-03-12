@@ -1,10 +1,10 @@
 import { BadTypeError, SchemaValidationError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 
-export class ArrayValidator<T> implements TypeValidator<Array<T>> {
+export class ArrayValidator<T> extends TypeValidator<Array<T>> {
     constructor(
         private elemValidator: TypeValidator<T>
-    ) {}
+    ) { super() }
 
     validate(value: unknown): Array<T> {
         if(Array.isArray(value)) {

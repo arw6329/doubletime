@@ -1,11 +1,11 @@
 import { BadFormatError, BadTypeError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 import { StringValidator } from "./StringValidator"
 
-export class BooleanValidator implements TypeValidator<boolean> {
+export class BooleanValidator extends TypeValidator<boolean> {
     constructor(
         private acceptBooleanLike: boolean = false
-    ) {}
+    ) { super() }
 
     validate(value: unknown): boolean {
         if(value === true || value === false) {

@@ -1,11 +1,11 @@
 import { BadFormatError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 import { StringValidator } from "./StringValidator"
 
-export class StringBackedEnumValidator<E extends { [key: number]: string }> implements TypeValidator<E[keyof E]> {
+export class StringBackedEnumValidator<E extends { [key: number]: string }> extends TypeValidator<E[keyof E]> {
     constructor(
         private enumObj: E
-    ) {}
+    ) { super() }
     
     validate(value: unknown): E[keyof E] {
         const strValue = new StringValidator({ minLength: 1 }).validate(value)

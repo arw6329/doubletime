@@ -1,5 +1,5 @@
 import { BadFormatError, BadTypeError, BadValueError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 
 export interface FloatValidatorOptions {
     parseStrings?: boolean,
@@ -8,10 +8,10 @@ export interface FloatValidatorOptions {
     ensure?: (value: number) => boolean
 }
 
-export class FloatValidator implements TypeValidator<number> {
+export class FloatValidator extends TypeValidator<number> {
     constructor(
         private options: FloatValidatorOptions = {}
-    ) {}
+    ) { super() }
 
     validate(value: unknown): number {
         if(this.options.parseStrings && typeof value === 'string') {

@@ -1,4 +1,5 @@
-import { ConcreteSchema, TypeValidator } from "./Validation/SchemaValidation";
+import { ConcreteSchema } from "./Validation/SchemaValidation";
+import type { TypeValidator } from "./Validation/TypeValidator";
 import { ArrayValidator } from "./Validation/Validators/ArrayValidator";
 import { BooleanValidator } from "./Validation/Validators/BooleanValidator";
 import { FloatValidator, FloatValidatorOptions } from "./Validation/Validators/FloatValidator";

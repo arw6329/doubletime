@@ -1,10 +1,10 @@
 import { BadFormatError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 import { StringValidator } from "./StringValidator"
 
 type Uuid = `${string}-${string}-${string}-${string}-${string}`
 
-export class UuidValidator implements TypeValidator<Uuid> {
+export class UuidValidator extends TypeValidator<Uuid> {
     validate(value: unknown): Uuid {
         const strValue = new StringValidator({ minLength: 1 }).validate(value)
 

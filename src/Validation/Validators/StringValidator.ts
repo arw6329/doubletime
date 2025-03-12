@@ -1,5 +1,5 @@
 import { BadTypeError, BadValueError, SchemaValidationError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 
 export interface StringValidatorOptions {
     minLength?: number,
@@ -10,10 +10,10 @@ export interface StringValidatorOptions {
     transform?: (string: string) => string
 }
 
-export class StringValidator implements TypeValidator<string> {
+export class StringValidator extends TypeValidator<string> {
     constructor(
         private options: StringValidatorOptions = {}
-    ) {}
+    ) { super() }
 
     validate(value: unknown): string {
         if(typeof value !== 'string') {

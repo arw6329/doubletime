@@ -1,10 +1,7 @@
 import type { ShorthandValidatorKey, ShorthandValidators } from "./ShorthandValidators"
 import { nullable } from "./Validators/ObjectValidator"
 import { ArrayValidator } from "./Validators/ArrayValidator"
-
-export interface TypeValidator<T> {
-    validate(value: unknown): T
-}
+import { type TypeValidator } from "./TypeValidator"
 
 export type ConcreteSchemaValue = TypeValidator<unknown> | ShorthandValidatorKey | ConcreteSchema | [ ConcreteSchemaValue ]
 

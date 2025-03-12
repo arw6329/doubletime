@@ -57,7 +57,7 @@ typedObject.comments[1].edits?.[0].text
 
 - [Install](#install)
 - [Basic usage](#basic-usage)
-- [Schema syntax](#schema-syntax)
+- [Object schema syntax](#schema-syntax)
     - [Strings](#strings)
         - [Basic strings](#basic-strings)
         - [Enforcing strings are non-empty](#enforcing-strings-are-non-empty)
@@ -71,6 +71,8 @@ typedObject.comments[1].edits?.[0].text
     - [Optionality](#optionality)
 - [Numeric validator options](#numeric-validator-options)
 - [String validator options](#string-validator-options)
+- [Throwing vs returning validation errors](#throwing-vs-returning-validation-errors)
+- [Custom validators](#custom-validators)
 - [TODO/Planned features](#todoplanned-features)
 - [License](#license)
 
@@ -666,7 +668,88 @@ const c = validator.validate('AVeryLongUsernameHere')
 const d = validator.validate('B@d~characters!')
 ```
 
-Note that `transform` occurs after other checks like `minLength/maxLength/ensure` and can return a value that
+Note that `transform` occurs after other checks like `minLength/maxLength/ensure` and can return a value that does not comply with these constraints.
+
+## Throwing vs returning validation errors 
+
+Calling `validate()` on any validator will cause a `SchemaValidationError` to be raised if the passed data is not valid:
+
+```ts
+import { int } from 'doubletime'
+
+// throws 'bad type; expected "number", got "string"'
+const typedInt = int().validate('whoops')
+```
+
+Instead of throwing errors, doubletime can return them by calling `safeValidate`:
+
+```ts
+import { int } from 'doubletime'
+
+const { value, error } = int().safeValidate('whoops')
+
+if(error) {
+    // Validation failed, handle error.
+    // "value" const is undefined.
+} else {
+    // Validation succeeded.
+    // "value" const is set.
+}
+```
+
+When using `safeValidate`, the `error` property of the returned object will be an instance of `Error` if an error occurred, otherwise `error` will be `undefined`.
+
+## Custom validators
+
+You can create custom validators for arbitrary datatypes by extending `TypeValidator<>` and implementing `validate()`. It is recommended to throw the errors provided by doubletime when validation fails.
+
+```ts
+import { TypeValidator, BadTypeError, BadFormatError, object, int } from '#/entrypoint'
+
+type DayOfWeek =
+    'Monday' |
+    'Tuesday' |
+    'Wednesday' |
+    'Thursday' |
+    'Friday' |
+    'Saturday' |
+    'Sunday'
+        
+class DayOfWeekValidator extends TypeValidator<DayOfWeek> {
+    validate(value: unknown): DayOfWeek {
+        if(typeof value !== 'string') {
+            throw new BadTypeError('string', typeof value)
+        }
+
+        if(![
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday'
+        ].includes(value)) {
+            throw new BadFormatError(value, 'day of week')
+        }
+
+        return value as DayOfWeek
+    }
+}
+
+const day = new DayOfWeekValidator().validate('Wednesday')
+        
+const dayAndDate = object({
+    day: new DayOfWeekValidator(),
+    date: int({
+        min: 1,
+        max: 31
+    })
+}).validate({
+    day: 'Friday',
+    date: 13
+})
+```
 
 ## TODO/Planned features
 

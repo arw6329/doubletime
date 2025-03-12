@@ -1,11 +1,11 @@
 import { BadFormatError, BadTypeError } from "#/errors"
-import type { TypeValidator } from "../SchemaValidation"
+import { TypeValidator } from "../TypeValidator"
 import { StringValidator } from "./StringValidator"
 
-export class UTCDateValidator implements TypeValidator<Date> {
+export class UTCDateValidator extends TypeValidator<Date> {
     constructor(
         private parseStrings: boolean
-    ) {}
+    ) { super() }
 
     validate(value: unknown): Date {
         if(value instanceof Date) {

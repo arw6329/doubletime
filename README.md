@@ -717,7 +717,7 @@ When using `safeValidate`, the `error` property of the returned object will be a
 You can create custom validators for arbitrary datatypes by extending `TypeValidator<>` and implementing `validate()`. It is recommended to throw the errors provided by doubletime when validation fails.
 
 ```ts
-import { TypeValidator, BadTypeError, BadFormatError, object, int } from '#/entrypoint'
+import { TypeValidator, BadTypeError, BadFormatError, object, int } from 'doubletime'
 
 type DayOfWeek =
     'Monday' |

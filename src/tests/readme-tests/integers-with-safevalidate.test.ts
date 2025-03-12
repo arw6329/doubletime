@@ -7,7 +7,6 @@ describe('README', () => {
     it('handles calls to safeValidate correctly', () => {
         const types = getTypes(__filename)
 
-        console.log(types)
         const { value: typedValue1, error: error1 } = int().safeValidate('whoops')
         
         {

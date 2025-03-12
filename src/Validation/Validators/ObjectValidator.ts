@@ -95,12 +95,12 @@ export class ObjectValidator<CS extends ConcreteSchema> extends TypeValidator<Sc
             // Default to null if key not provided.
             // At this point, key is either defined (possibly null)
             // or missing but marked as "default to null".
-            rawParams[key] ??= null
+            const rawValue = rawParams[key] ?? null
 
             const validator = concreteSchemaValueToValidator(this.concreteSchema[keyWithPossibleQuestionMark])
 
             try {
-                const value: unknown = validator.validate(rawParams[key]) as unknown
+                const value: unknown = validator.validate(rawValue) as unknown
                 (parsedParams as any)[key as keyof Schema<CS>] = value as any
             } catch(e) {
                 if(e instanceof Error) {

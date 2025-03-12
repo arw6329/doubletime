@@ -100,6 +100,17 @@ Validators throw a `SchemaValidationError` if the data passed to them is invalid
 const typedInt = int().validate('wow!')
 ```
 
+You can also use `safeValidate()` to return the error instead of throwing it - see [throwing vs returning validation errors](#throwing-vs-returning-validation-errors).
+
+Some validators accept parameters:
+
+```ts
+const typedInt = int({
+    min: 100,
+    max: 200
+}).validate(parseInt('123') as unknown)
+```
+
 The most important validator is `object()`, which accepts an object whose values are validators and can be used to verify the schema of an entire object:
 
 ```ts
@@ -212,6 +223,8 @@ printPersonDetails(person)
 
 ## Schema syntax
 
+This section details the syntax available on concrete schemas passed to `object()` validators. Validator functions like `int()` and `float()` can also be used by themselves and sometimes have more parameters specified in other sections.
+
 ### Strings
 
 #### Basic strings
@@ -278,7 +291,7 @@ const typedObject1 = object({
     def: 'trimmed string'
 }).validate({
     abc: '   Hello   ',
-    def: 'world'
+    def: '\tworld\n'
 })
 
 // throws 'value "" is not valid; minimum accepted length is 1'
@@ -337,7 +350,7 @@ const typedObject = object({
 })
 ```
 
-Strings containing integers are not accepted:
+Strings containing integers are not accepted by default:
 
 ```ts
 // throws 'bad type; expected "number", got "string"'
@@ -371,7 +384,7 @@ const typedObject = object({
 })
 ```
 
-Strings containing numbers are not accepted:
+Strings containing numbers are not accepted by default:
 
 ```ts
 // throws 'bad type; expected "number", got "string"'
@@ -670,7 +683,7 @@ const d = validator.validate('B@d~characters!')
 
 Note that `transform` occurs after other checks like `minLength/maxLength/ensure` and can return a value that does not comply with these constraints.
 
-## Throwing vs returning validation errors 
+## Throwing vs returning validation errors
 
 Calling `validate()` on any validator will cause a `SchemaValidationError` to be raised if the passed data is not valid:
 
@@ -753,13 +766,11 @@ const dayAndDate = object({
 
 ## TODO/Planned features
 
-- Custom type validators
-- safeValidate() alternative that returns { typedObject } | { error } instead of throwing errors on validation failure
 - Email validator
-- Ability to specify min/max for numeric validators, min/max length for string validators, etc.
 - Union and intersection validators
 - String enum validators
-- Support parsing strings for int()/float()/object()
+- TS enum validators
+- Support parsing JSON strings for object()
 - Boolean-like validators (accepting integers 0/1, etc.)
 - Date validators (yyyy-mm-dd UTC date and yyyy-mm-dd hh:mm:ss UTC timestamp formats)
 

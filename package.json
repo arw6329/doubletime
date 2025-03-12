@@ -1,6 +1,6 @@
 {
     "name": "doubletime",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "description": "Validate object schemas with compile-time and runtime type safety",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -22,8 +22,11 @@
         "types",
         "type validation",
         "schema validation",
+        "object validation",
         "type safety",
-        "runtime types"
+        "runtime types",
+        "object schemas",
+        "object type inference"
     ],
     "author": "",
     "license": "MIT",

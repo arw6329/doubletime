@@ -11,7 +11,7 @@ describe('README', () => {
             def: 'trimmed string'
         }).validate({
             abc: '   Hello   ',
-            def: 'world'
+            def: '\tworld\n'
         })
 
         expect(typedObject1).toEqual({

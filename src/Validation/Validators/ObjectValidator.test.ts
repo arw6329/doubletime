@@ -68,6 +68,6 @@ describe('ObjectValidator', () => {
 
         const untypedObject = {} as unknown
         validator.validate(untypedObject)
-        expect(typeof (untypedObject as any)['a']).toBe(undefined)
+        expect(typeof (untypedObject as any)['a']).toBe('undefined')
     })
 })

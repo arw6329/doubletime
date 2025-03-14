@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { object, nullable, choice } from './entrypoint'
+import { object, nullable, choices, union, string, int } from './entrypoint'
 import { concreteSchema } from './tests/test-objects/concrete-schema'
 import { testObject } from './tests/test-objects/test-object'
 import { expectedObject } from './tests/test-objects/expected-object'
@@ -222,11 +222,22 @@ describe('doubletime package', () => {
     it('validates and types string enums in objects correctly', () => {
         /** @export stringEnumInObject */
         const typedObject = object({
-            a: choice('red', 'yellow', 'green')
+            a: choices('red', 'yellow', 'green')
         }).validate({
             a: 'yellow'
         } as unknown)
         expect(typedObject).toEqual({ a: 'yellow' })
         expect(types['stringEnumInObject']).toEqual('{ a: "red" | "yellow" | "green"; }')
+    })
+
+    it('validates and types unions in objects correctly', () => {
+        /** @export unionInObject */
+        const typedObject = object({
+            a: union(int(), string())
+        }).validate({
+            a: 123
+        } as unknown)
+        expect(typedObject).toEqual({ a: 123 })
+        expect(types['unionInObject']).toEqual('{ a: string | number; }')
     })
 })

@@ -8,6 +8,7 @@ import { IntegerValidator, type IntegerValidatorOptions } from "./Validation/Val
 import { NullableValidator } from "./Validation/Validators/NullableValidator";
 import { ObjectValidator } from "./Validation/Validators/ObjectValidator";
 import { StringValidator, StringValidatorOptions } from "./Validation/Validators/StringValidator";
+import { UnionValidator } from "./Validation/Validators/UnionValidator";
 import { UuidValidator } from "./Validation/Validators/UuidValidator";
 
 export function array<T>(elemValidator: TypeValidator<T>): ArrayValidator<T> {
@@ -42,6 +43,10 @@ export function uuid(): UuidValidator {
     return new UuidValidator
 }
 
-export function choice<T extends string>(...enumValues: T[]): EnumValidator<T> {
+export function choices<T extends string>(...enumValues: T[]): EnumValidator<T> {
     return new EnumValidator(...enumValues)
+}
+
+export function union<T extends [...unknown[]]>(...validators: {[Key in keyof T]: TypeValidator<T[Key]>}): UnionValidator<T> {
+    return new UnionValidator<T>(...validators)
 }

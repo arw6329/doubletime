@@ -70,6 +70,7 @@ typedObject.comments[1].edits?.[0].text
     - [Nullability](#nullability)
     - [Optionality](#optionality)
 - [String enumerations](#string-enumerations)
+- [Validator unions](#validator-unions)
 - [Numeric validator options](#numeric-validator-options)
 - [String validator options](#string-validator-options)
 - [Throwing vs returning validation errors](#throwing-vs-returning-validation-errors)
@@ -617,18 +618,72 @@ const typedObject2 = validator.validate({
 
 ## String enumerations
 
-You can use the `choice()` validator to create an enumeration of string values (`enum` is a reserved word in TypeScript):
+You can use the `choices()` validator to create an enumeration of string values:
 
 ```ts
-import { choice } from 'doubletime'
+import { choices } from 'doubletime'
 
-const validator = choice('one', 'two', 'three', 'four')
+const validator = choices('one', 'two', 'three', 'four')
 
 // typeof typedValue is "one" | "two" | "three" | "four"
 const typedValue = validator.validate('three')
 
 // throws 'value "five" not a valid enum of (one | two | three | four)'
-const typedValue = validator.validate('five')
+const typedValue2 = validator.validate('five')
+```
+
+## Validator unions
+
+You can use the `union()` validator to create unions of multiple validators. Data is valid to a union validator if it is valid to any of its constituent validators.
+
+```ts
+import { union, int, string } from 'doubletime'
+
+const validator = union(int(), string())
+
+// typeof typedValue1/typedValue2 is number | string
+const typedValue1 = validator.validate(123)
+const typedValue2 = validator.validate('$456')
+
+// throws 'value "false" did not match any member of union type. Component errors were: bad type; expected "number", got "boolean"; bad type; expected "string", got "boolean"'
+const typedValue3 = validator.validate(false)
+```
+
+Since you can pass a single option to `choices()` to type an object property as a constant, you can pass multiple `object()` validators with different schemas to `union()` and differentiate between them by a common property typed with `choices()`, like so:
+
+```ts
+// typeof commentAction is {
+//     action: "create";
+//     text: string;
+//     inReplyTo?: `${string}-${string}-${string}-${string}-${string}`;
+// } | {
+//     action: "edit";
+//     commentId: `${string}-${string}-${string}-${string}-${string}`;
+//     text: string;
+// }
+const commentAction = union(
+    object({
+        action: choices('create'),
+        text: 'string',
+        'inReplyTo?': 'uuid'
+    }),
+    object({
+        action: choices('edit'),
+        commentId: 'uuid',
+        text: 'string'
+    })
+).validate({
+    action: 'edit',
+    commentId: '5ca28d8c-a909-4900-9ffb-afb14a28dbd3',
+    text: 'Hello world'
+})
+
+if(commentAction.action === 'edit') {
+    // TypeScript does not complain here, since the type of
+    // commentAction is constrained by the action property
+    const id = commentAction.commentId
+    // ...
+}
 ```
 
 ## Numeric validator options
@@ -784,7 +839,7 @@ const dayAndDate = object({
 ## TODO/Planned features
 
 - Email validator
-- Union and intersection validators
+- Intersection validators
 - TS enum validators
 - Support parsing JSON strings for object()
 - Boolean-like validators (accepting integers 0/1, etc.)

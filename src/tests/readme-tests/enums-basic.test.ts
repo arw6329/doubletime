@@ -1,10 +1,10 @@
 import { describe, expect, it } from "@jest/globals"
-import { choice } from '#/entrypoint'
+import { choices } from '#/entrypoint'
 import { getTypes } from "../get-typescript-type"
 
 describe('README', () => {
     it('parses string enumerations correctly', () => {
-        const validator = choice('one', 'two', 'three', 'four')
+        const validator = choices('one', 'two', 'three', 'four')
 
         /** @export typedValue */
         const typedValue = validator.validate('three')

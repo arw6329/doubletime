@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { object, nullable } from './entrypoint'
+import { object, nullable, choice } from './entrypoint'
 import { concreteSchema } from './tests/test-objects/concrete-schema'
 import { testObject } from './tests/test-objects/test-object'
 import { expectedObject } from './tests/test-objects/expected-object'
@@ -217,5 +217,16 @@ describe('doubletime package', () => {
             }]
         })
         expect(types['arraysOfObjects']).toEqual('{ a: { b: number; c: string; }[]; }')
+    })
+
+    it('validates and types string enums in objects correctly', () => {
+        /** @export stringEnumInObject */
+        const typedObject = object({
+            a: choice('red', 'yellow', 'green')
+        }).validate({
+            a: 'yellow'
+        } as unknown)
+        expect(typedObject).toEqual({ a: 'yellow' })
+        expect(types['stringEnumInObject']).toEqual('{ a: "red" | "yellow" | "green"; }')
     })
 })

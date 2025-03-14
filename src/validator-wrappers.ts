@@ -2,6 +2,7 @@ import { ConcreteSchema } from "./Validation/SchemaValidation";
 import type { TypeValidator } from "./Validation/TypeValidator";
 import { ArrayValidator } from "./Validation/Validators/ArrayValidator";
 import { BooleanValidator } from "./Validation/Validators/BooleanValidator";
+import { EnumValidator } from "./Validation/Validators/EnumValidator";
 import { FloatValidator, FloatValidatorOptions } from "./Validation/Validators/FloatValidator";
 import { IntegerValidator, type IntegerValidatorOptions } from "./Validation/Validators/IntegerValidator";
 import { NullableValidator } from "./Validation/Validators/NullableValidator";
@@ -39,4 +40,8 @@ export function string(options: StringValidatorOptions = {}): StringValidator {
 
 export function uuid(): UuidValidator {
     return new UuidValidator
+}
+
+export function choice<T extends string>(...enumValues: T[]): EnumValidator<T> {
+    return new EnumValidator(...enumValues)
 }

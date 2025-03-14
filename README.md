@@ -69,6 +69,7 @@ typedObject.comments[1].edits?.[0].text
     - [Arrays](#arrays)
     - [Nullability](#nullability)
     - [Optionality](#optionality)
+- [String enumerations](#string-enumerations)
 - [Numeric validator options](#numeric-validator-options)
 - [String validator options](#string-validator-options)
 - [Throwing vs returning validation errors](#throwing-vs-returning-validation-errors)
@@ -614,6 +615,22 @@ const typedObject2 = validator.validate({
 })
 ```
 
+## String enumerations
+
+You can use the `choice()` validator to create an enumeration of string values (`enum` is a reserved word in TypeScript):
+
+```ts
+import { choice } from 'doubletime'
+
+const validator = choice('one', 'two', 'three', 'four')
+
+// typeof typedValue is "one" | "two" | "three" | "four"
+const typedValue = validator.validate('three')
+
+// throws 'value "five" not a valid enum of (one | two | three | four)'
+const typedValue = validator.validate('five')
+```
+
 ## Numeric validator options
 
 Integer and float validators support the following options:
@@ -768,7 +785,6 @@ const dayAndDate = object({
 
 - Email validator
 - Union and intersection validators
-- String enum validators
 - TS enum validators
 - Support parsing JSON strings for object()
 - Boolean-like validators (accepting integers 0/1, etc.)

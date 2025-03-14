@@ -249,6 +249,8 @@ const typedObject = object({
 })
 ```
 
+See [string validator options](#string-validator-options) for options available on `string()`.
+
 #### Enforcing strings are non-empty
 
 You can use the value `'non-empty string'` to enforce a string-valued object key is non-empty:
@@ -363,6 +365,8 @@ const typedObject = object({
 })
 ```
 
+See [numeric validator options](#numeric-validator-options) for options available on `int()`.
+
 ### Floating point numbers
 
 Use `'float'` or `float()` to enforce an object key is a floating point number:
@@ -396,6 +400,8 @@ const typedObject = object({
     abc: '123.456'
 })
 ```
+
+See [numeric validator options](#numeric-validator-options) for options available on `float()`.
 
 ### Booleans
 
@@ -841,6 +847,7 @@ const dayAndDate = object({
 - Email validator
 - Intersection validators
 - TS enum validators
+- Array validator options (ex. min/maxLength, unique/uniqueBy)
 - Support parsing JSON strings for object()
 - Boolean-like validators (accepting integers 0/1, etc.)
 - Date validators (yyyy-mm-dd UTC date and yyyy-mm-dd hh:mm:ss UTC timestamp formats)

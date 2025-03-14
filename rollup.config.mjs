@@ -14,6 +14,13 @@ export default defineConfig([
 	}, {
 		input: 'src/index.ts',
 		output: {
+			file: 'dist/index-cjs.js',
+			format: 'cjs'
+		},
+		plugins: [typescript(), terser()]
+	}, {
+		input: 'src/index.ts',
+		output: {
 			file: 'dist/index.d.ts',
 			format: 'es'
 		},
